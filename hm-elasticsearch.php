@@ -1,5 +1,13 @@
 <?php
 
+/*
+Plugin Name: HM Elastic Search
+Description: Developer's ElasticSearch integration for WordPress
+Author: Theo Savage
+Version: 0.1
+Author URI: http://hmn.md/
+*/
+
 require_once ( __DIR__ . '/hm-elasticsearch-admin.php' );
 
 hm_es_include_dir( __DIR__ . '/classes' );
@@ -26,10 +34,10 @@ add_action( 'plugins_loaded', 'hm_es_init_types' );
  */
 function hm_es_get_type_class_names() {
 	return array(
-		'post'	    => 'HMES_Post_Type',
-		'user'	    => 'HMES_User_Type',
-		'comment'	=> 'HMES_Comment_Type',
-		'term'		=> 'HMES_Term_Type'
+		'post'      => 'HMES_Post_Type',
+		'user'      => 'HMES_User_Type',
+		'comment'   => 'HMES_Comment_Type',
+		'term'      => 'HMES_Term_Type'
 	);
 }
 
