@@ -1,0 +1,135 @@
+EXAMPLES:
+
+Get all posts of post type page
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'term' => array(
+			'post_type' => 'page'
+		)
+	)
+) )
+
+Get all posts of type post which have author of ID 1
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'bool' => array(
+			'must' => array(
+				array(
+					'term' => array(
+						'post_type' => 'post',
+					),
+				),
+				array(
+					'term' => array(
+						'post_author' => '1'
+					)
+				)
+			),
+		)
+	)
+) );
+
+Get all posts of type post which contain the phrase 'post phrase' in their content
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'bool' => array(
+			'must' => array(
+				array(
+					'term' => array(
+						'post_type' => 'post',
+					),
+				),
+				array(
+					'match_phrase' => array(
+						'post_content' => 'post phrase'
+					)
+				)
+			),
+		)
+	)
+) );
+
+
+Get all posts of type post which are in are which are assigned term of ID 1 in the category taxonomy
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'bool' => array(
+			'must' => array(
+				array(
+					'term' => array(
+						'post_type' => 'post',
+					),
+				),
+				array(
+					'term' => array(
+						'taxonomies.category.term_id' => '1'
+					)
+				)
+			),
+		)
+	)
+) );
+
+Get all posts of type post which have the phrase 'Post Title' in their title, and has the word 'Post' or 'Content' in it's content
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'bool' => array(
+			'must' => array(
+				array(
+					'match' => array(
+						'post_type' => 'post',
+					),
+				),
+				array(
+					'match_phrase' => array(
+						'post_title' => 'Post Title'
+					)
+				),
+				array(
+					'match' => array(
+						'post_content' => 'Post Content'
+					)
+				)
+			),
+		)
+	)
+) )
+
+Get all posts of type post which have either the word 'Post' or 'Title' in their title or content, but weight title matches higher than content matches
+
+$type = HMES_Type_Manager::get_type( 'post' );
+
+$type->search( array(
+	"query" => array(
+		'bool' => array(
+			'must' => array(
+				array(
+					'match' => array(
+						'post_type' => 'post',
+					),
+				),
+				array(
+					'multi_match' => array(
+						'query'  => 'Post Title',
+						'fields' => array( 'post_title^5', 'post_content' )
+					)
+				),
+			)
+		)
+	)
+) );

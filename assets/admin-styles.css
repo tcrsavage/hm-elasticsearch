@@ -1,0 +1,56 @@
+.hmes-log-table tr td.expand {
+	text-align: center;
+	font-weight: bold;
+	font-size: 21px;
+	cursor: pointer;
+}
+
+.hmes-log-table tr div {
+
+	height: 30px;
+	overflow: hidden;
+}
+
+.hmes-log-table tr.expanded div {
+	height: auto;
+}
+
+.hmes-log-table-pagination {
+	margin-right: 3px;
+	margin-top: 3px;
+	float: right;
+}
+
+.hmes-log-table tr .td-id {
+	width: 20px;
+}
+
+.hmes-log-table tr .td-date {
+	width: 50px;
+}
+
+.hmes-log-table tr .td-type {
+	width: 40px;
+}
+
+.hmes-log-table tr .td-index {
+
+	width: 40px;
+}
+
+.hmes-log-table tr .td-document-type {
+	width: 65px;
+}
+
+.hmes-log-table tr .td-caller {
+	width: 120px;
+}
+
+.hmes-log-table tr .td-args {
+
+	max-width: 100px;
+}
+
+.hmes-log-table tr .td-message {
+	max-width: 250px;
+}

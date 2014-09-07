@@ -1,0 +1,3 @@
+[submodule "lib/elasticsearch"]
+	path = lib/elasticsearch
+	url = https://github.com/nervetattoo/elasticsearch.git
