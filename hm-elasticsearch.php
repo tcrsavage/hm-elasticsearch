@@ -46,7 +46,7 @@ function hm_es_get_type_class_names() {
  *
  * @param array $connection_args
  * @param array $index_creation_args
- * @return array|bool|Exception
+ * @return array|bool
  */
 function hm_es_init_elastic_search_index( $connection_args = array(), $index_creation_args = array() ) {
 
@@ -57,19 +57,11 @@ function hm_es_init_elastic_search_index( $connection_args = array(), $index_cre
 	}
 
 	if ( ! $es->is_index_created() ) {
-		try {
 
-			$r = $es->create_index( $index_creation_args );
-
-		} catch ( \Exception $e ) {
-
-			return $e;
-		}
-
-		return $r;
+		return $es->create_index( $index_creation_args );
 	}
 
-	return true;
+	return false;
 }
 
 /**
@@ -88,19 +80,11 @@ function hm_es_delete_elastic_search_index( $connection_args = array(), $index_d
 	}
 
 	if (  $es->is_index_created() ) {
-		try {
 
-			$r = $es->delete_index( $index_deletion_args );
-
-		} catch ( \Exception $e ) {
-
-			return $e;
-		}
-
-		return $r;
+		return $es->delete_index( $index_deletion_args );
 	}
 
-	return true;
+	return false;
 }
 
 /**
