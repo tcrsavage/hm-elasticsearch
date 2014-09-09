@@ -1,6 +1,8 @@
 <?php
 
-class HMES_Type_Manager {
+namespace HMES;
+
+class Type_Manager {
 
 	static $types = array();
 
@@ -24,7 +26,7 @@ class HMES_Type_Manager {
 	/**
 	 * Get all HMES type class instances
 	 *
-	 * @return HMES_Base_Type[]
+	 * @return Types\Base[]
 	 */
 	static function get_types() {
 
@@ -35,7 +37,7 @@ class HMES_Type_Manager {
 	 * Get a HMES type class instance from the type name
 	 *
 	 * @param $type_name
-	 * @return HMES_Base_Type|bool
+	 * @return Types\Base|bool
 	 */
 	static function get_type( $type_name ) {
 
@@ -54,7 +56,7 @@ class HMES_Type_Manager {
 	 * Verify the setup of a HMES type class
 	 *
 	 * @param $class
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	static function verify_setup( $class ) {
 

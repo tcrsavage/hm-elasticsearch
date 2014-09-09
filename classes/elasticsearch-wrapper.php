@@ -1,6 +1,8 @@
 <?php
 
-class HMES_ElasticSearch_Wrapper {
+namespace HMES;
+
+class Wrapper {
 
 	var $connection           = false;
 	var $client               = false;
@@ -11,11 +13,11 @@ class HMES_ElasticSearch_Wrapper {
 	function __construct( $args = array() ) {
 
 		$this->args = wp_parse_args( $args, array(
-			'host'      => HMES_Configuration::get_default_host(),
-			'port'      => HMES_Configuration::get_default_port(),
-			'protocol'  => HMES_Configuration::get_default_protocol(),
-			'index'     => HMES_Configuration::get_default_index_name(),
-			'timeout'   => HMES_Configuration::get_default_timeout(),
+			'host'      => Configuration::get_default_host(),
+			'port'      => Configuration::get_default_port(),
+			'protocol'  => Configuration::get_default_protocol(),
+			'index'     => Configuration::get_default_index_name(),
+			'timeout'   => Configuration::get_default_timeout(),
 		) );
 	}
 
@@ -23,7 +25,7 @@ class HMES_ElasticSearch_Wrapper {
 	 * Get a class instance
 	 *
 	 * @param array $args
-	 * @return HMES_ElasticSearch_Wrapper
+	 * @return Wrapper
 	 */
 	static function get_instance( $args = array() ) {
 
@@ -64,11 +66,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'delete', $this, array( 'id' => $id, 'options' => $options ), $e );
+			Logger::process_exception( 'delete', $this, array( 'id' => $id, 'options' => $options ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'delete', $this, array( 'id' => $id, 'options' => $options ), $r );
+		Logger::process_response( 'delete', $this, array( 'id' => $id, 'options' => $options ), $r );
 
 		return $r;
 	}
@@ -88,11 +90,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'delete_by_query', $this, array( 'query' => $query, 'options' => $options ), $e );
+			Logger::process_exception( 'delete_by_query', $this, array( 'query' => $query, 'options' => $options ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'delete_by_query', $this, array( 'query' => $query, 'options' => $options ), $r );
+		Logger::process_response( 'delete_by_query', $this, array( 'query' => $query, 'options' => $options ), $r );
 
 		return $r;
 	}
@@ -113,11 +115,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'index', $this, array( 'document' => $document, 'id' => $id, 'options' => $options ), $e );
+			Logger::process_exception( 'index', $this, array( 'document' => $document, 'id' => $id, 'options' => $options ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'index', $this, array( 'document' => $document, 'id' => $id, 'options' => $options ), $r );
+		Logger::process_response( 'index', $this, array( 'document' => $document, 'id' => $id, 'options' => $options ), $r );
 
 		return $r;
 	}
@@ -137,11 +139,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'map', $this, array( 'mapping' => $mapping, 'options' => $options ), $e );
+			Logger::process_exception( 'map', $this, array( 'mapping' => $mapping, 'options' => $options ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'map', $this, array( 'mapping' => $mapping, 'options' => $options ), $r );
+		Logger::process_response( 'map', $this, array( 'mapping' => $mapping, 'options' => $options ), $r );
 
 		return $r;
 	}
@@ -159,11 +161,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'refresh', $this, array(), $e );
+			Logger::process_exception( 'refresh', $this, array(), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'refresh', $this, array(), $r );
+		Logger::process_response( 'refresh', $this, array(), $r );
 
 		return $r;
 	}
@@ -185,11 +187,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'request', $this, array( 'path' => $path, 'method' => $method, 'payload' => $payload ), $e );
+			Logger::process_exception( 'request', $this, array( 'path' => $path, 'method' => $method, 'payload' => $payload ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'request', $this, array(  'path' => $path, 'method' => $method, 'payload' => $payload ), $r );
+		Logger::process_response( 'request', $this, array(  'path' => $path, 'method' => $method, 'payload' => $payload ), $r );
 
 		return $r;
 	}
@@ -209,11 +211,11 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'search', $this, array( 'query' => $query, 'options' => $options ), $e );
+			Logger::process_exception( 'search', $this, array( 'query' => $query, 'options' => $options ), $e );
 			return false;
 		}
 
-		HMES_Logger::process_response( 'search', $this, array( 'query' => $query, 'options' => $options ), $r );
+		Logger::process_response( 'search', $this, array( 'query' => $query, 'options' => $options ), $r );
 
 		return $r;
 	}
@@ -261,7 +263,7 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch ( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'get_status', $this, array( 'path' => array( '_status' ) ), $e );
+			Logger::process_exception( 'get_status', $this, array( 'path' => array( '_status' ) ), $e );
 
 			return false;
 		}
@@ -294,7 +296,7 @@ class HMES_ElasticSearch_Wrapper {
 		} catch ( \Exception $e ) {
 
 			if ( $args['log'] ) {
-				HMES_Logger::process_exception( 'is_connection_available', $this, array( 'path' => array( '_status' ) ), $e );
+				Logger::process_exception( 'is_connection_available', $this, array( 'path' => array( '_status' ) ), $e );
 			}
 
 			return false;
@@ -333,7 +335,7 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch ( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'create_index', $this, array( 'args' => $args ), $e );
+			Logger::process_exception( 'create_index', $this, array( 'args' => $args ), $e );
 
 			return false;
 		}
@@ -355,7 +357,7 @@ class HMES_ElasticSearch_Wrapper {
 
 		} catch ( \Exception $e ) {
 
-			HMES_Logger::process_exception( 'delete_index', $this, array( 'args' => $args ), $e );
+			Logger::process_exception( 'delete_index', $this, array( 'args' => $args ), $e );
 
 			return false;
 		}

@@ -1,6 +1,8 @@
 <?php
 
-class HMES_Configuration {
+namespace HMES;
+
+class Configuration {
 
 	/**
 	 * Set the default elasticsearch host address to be used by the elasticsearch API wrapper

@@ -1,6 +1,8 @@
 <?php
 
-class HMES_Logger {
+namespace HMES;
+
+class Logger {
 
 	static $max_logs = 500;
 
@@ -8,11 +10,11 @@ class HMES_Logger {
 	 * Process a response from elasticsearch and create a log entry if there is an erroneous response
 	 *
 	 * @param $function
-	 * @param HMES_ElasticSearch_Wrapper $class
+	 * @param Wrapper $class
 	 * @param $payload
 	 * @param $response
 	 */
-	static function process_response( $function, HMES_ElasticSearch_Wrapper $class, $payload, $response ) {
+	static function process_response( $function, Wrapper $class, $payload, $response ) {
 
 		if ( ! is_array( $response ) || empty( $response['error'] ) ) {
 			return;
@@ -36,11 +38,11 @@ class HMES_Logger {
 	 * Process an exception from the elasticsearch wrapper and create a log entry
 	 *
 	 * @param $function
-	 * @param HMES_ElasticSearch_Wrapper $class
+	 * @param Wrapper $class
 	 * @param $payload
-	 * @param Exception $e
+	 * @param \Exception $e
 	 */
-	static function process_exception( $function, HMES_ElasticSearch_Wrapper $class, $payload, \Exception $e ) {
+	static function process_exception( $function, Wrapper $class, $payload, \Exception $e ) {
 
 		$log_entry = array(
 			'timestamp'       => time(),

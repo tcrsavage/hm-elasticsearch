@@ -2,7 +2,9 @@
 
 //todo: taxonomies can be modified and deleted (what to do in this case)
 
-class HMES_Term_Type extends HMES_Base_Type {
+namespace HMES\Types;
+
+class Term extends Base {
 
 	var $name             = 'term';
 	var $index_hooks      = array();

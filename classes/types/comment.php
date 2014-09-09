@@ -1,6 +1,8 @@
 <?php
 
-class HMES_Comment_Type extends HMES_Base_Type {
+namespace HMES\Types;
+
+class Comment extends Base {
 
 	var $name             = 'comment';
 	var $index_hooks      = array( 'wp_insert_comment', 'edit_comment' );

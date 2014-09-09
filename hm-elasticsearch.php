@@ -8,21 +8,23 @@ Version: 0.1
 Author URI: http://hmn.md/
 */
 
+namespace HMES;
+
 require_once ( __DIR__ . '/hm-elasticsearch-admin.php' );
 
-hm_es_include_dir( __DIR__ . '/classes' );
-hm_es_include_dir( __DIR__ . '/lib/elasticsearch/src' );
+include_dir( __DIR__ . '/classes' );
+include_dir( __DIR__ . '/lib/elasticsearch/src' );
 
 /**
  * Init ell HMES type classes on plugins_loaded hook
  */
-function hm_es_init_types() {
+function init_types() {
 
-	if ( ! HMES_Configuration::get_is_enabled() ) {
+	if ( ! Configuration::get_is_enabled() ) {
 		return;
 	}
 
-	HMES_Type_Manager::init_types();
+	Type_Manager::init_types();
 }
 
 add_action( 'plugins_loaded', 'hm_es_init_types' );
@@ -32,12 +34,12 @@ add_action( 'plugins_loaded', 'hm_es_init_types' );
  *
  * @return array
  */
-function hm_es_get_type_class_names() {
+function get_type_class_names() {
 	return array(
-		'post'      => 'HMES_Post_Type',
-		'user'      => 'HMES_User_Type',
-		'comment'   => 'HMES_Comment_Type',
-		'term'      => 'HMES_Term_Type'
+		'post'      => '\HMES\Types\Post',
+		'user'      => '\HMES\Types\User',
+		'comment'   => '\HMES\Types\Comment',
+		'term'      => '\HMES\Types\Term'
 	);
 }
 
@@ -48,9 +50,9 @@ function hm_es_get_type_class_names() {
  * @param array $index_creation_args
  * @return array|bool
  */
-function hm_es_init_elastic_search_index( $connection_args = array(), $index_creation_args = array() ) {
+function init_elastic_search_index( $connection_args = array(), $index_creation_args = array() ) {
 
-	$es = HMES_ElasticSearch_Wrapper::get_instance( $connection_args );
+	$es = Wrapper::get_instance( $connection_args );
 
 	if ( ! $es->is_connection_available( array( 'log' => false ) ) ) {
 		return false;
@@ -69,11 +71,11 @@ function hm_es_init_elastic_search_index( $connection_args = array(), $index_cre
  *
  * @param array $connection_args
  * @param array $index_deletion_args
- * @return array|bool|Exception
+ * @return array|bool|\Exception
  */
-function hm_es_delete_elastic_search_index( $connection_args = array(), $index_deletion_args = array() ) {
+function delete_elastic_search_index( $connection_args = array(), $index_deletion_args = array() ) {
 
-	$es = HMES_ElasticSearch_Wrapper::get_instance( $connection_args );
+	$es = Wrapper::get_instance( $connection_args );
 
 	if ( ! $es->is_connection_available( array( 'log' => false ) ) ) {
 		return false;
@@ -94,7 +96,7 @@ function hm_es_delete_elastic_search_index( $connection_args = array(), $index_d
  * @param int $depth
  * @param int $max_scan_depth
  */
-function hm_es_include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
+function include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
 
 	if ( $depth > $max_scan_depth ) {
 		return;
@@ -107,7 +109,7 @@ function hm_es_include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
 		if ( preg_match( '/\.php$/', $path ) ) {
 			require_once $path;
 		} elseif ( is_dir( $path ) ) {
-			hm_es_include_dir( $path, $depth + 1, $max_scan_depth );
+			include_dir( $path, $depth + 1, $max_scan_depth );
 		}
 	}
 }

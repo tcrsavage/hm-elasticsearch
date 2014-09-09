@@ -1,11 +1,13 @@
 <?php
 
+namespace HMES;
+
 add_action( 'admin_menu', 'hm_es_admin_screen' );
 
 /**
  * Add a submenu page to settings for HMES
  */
-function hm_es_admin_screen() {
+function admin_screen() {
 
 	$hook = add_submenu_page( 'options-general.php', 'ElasticSearch Settings', 'ElasticSearch Settings', 'manage_options', 'elastic-search-settings', function() {
 		?>
@@ -20,20 +22,20 @@ function hm_es_admin_screen() {
 					<tbody>
 					<tr valign="top">
 						<th scope="row"><label for="hm_es_host">Elastic Search Host</label></th>
-						<td><input name="hm_es_host" type="text" id="hm_es_host" value="<?php echo HMES_Configuration::get_default_host(); ?>" placeholder="10.1.1.5" class="regular-text"></td>
+						<td><input name="hm_es_host" type="text" id="hm_es_host" value="<?php echo Configuration::get_default_host(); ?>" placeholder="10.1.1.5" class="regular-text"></td>
 					</tr>
 
 					<tr valign="top">
 						<th scope="row"><label for="hm_es_port">Elastic Search Port</label></th>
-						<td><input name="hm_es_port" type="text" id="hm_es_port" value="<?php echo HMES_Configuration::get_default_port(); ?>" placeholder="9200" class="regular-text"></td>
+						<td><input name="hm_es_port" type="text" id="hm_es_port" value="<?php echo Configuration::get_default_port(); ?>" placeholder="9200" class="regular-text"></td>
 					</tr>
 
 					<tr valign="top">
 						<th scope="row"><label for="hm_es_protocol">Elastic Search Protocol</label></th>
 						<td>
 							<select	id="hm_es_protocol" name="hm_es_protocol">
-								<?php foreach ( HMES_Configuration::get_supported_protocols() as $protocol => $label ) : ?>
-									<option value="<?php echo $protocol; ?>" <?php selected( $protocol, HMES_Configuration::get_default_protocol() ); ?>><?php echo $label; ?></option>
+								<?php foreach ( Configuration::get_supported_protocols() as $protocol => $label ) : ?>
+									<option value="<?php echo $protocol; ?>" <?php selected( $protocol, Configuration::get_default_protocol() ); ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
 							</select>
 						</td>
@@ -43,11 +45,11 @@ function hm_es_admin_screen() {
 						<th scope="row"><label for="hm_es_is_enabled">Enable Elastic Search Indexing</label></th>
 						<td>
 							<input type="hidden" name="hm_es_is_enabled" value="0" />
-							<input name="hm_es_is_enabled" type="checkbox" id="hm_es_is_enabled" <?php checked( HMES_Configuration::get_is_enabled() ); ?> value="1">
+							<input name="hm_es_is_enabled" type="checkbox" id="hm_es_is_enabled" <?php checked( Configuration::get_is_enabled() ); ?> value="1">
 						</td>
 					</tr>
 
-					<?php if ( HMES_Logger::count_logs() ) : ?>
+					<?php if ( Logger::count_logs() ) : ?>
 
 						<tr valign="top">
 							<th scope="row"><label for="hm_es_clear_logs">Clear Logs</label></th>
@@ -68,7 +70,7 @@ function hm_es_admin_screen() {
 					</tr>
 
 					<tr valign="top">
-						<?php $status = HMES_ElasticSearch_Wrapper::get_instance()->is_connection_available( array( 'log' => false ) ); ?>
+						<?php $status = Wrapper::get_instance()->is_connection_available( array( 'log' => false ) ); ?>
 						<th scope="row"><label for="">Status</label></th>
 						<td><span style="color: <?php echo ( $status ) ? 'green' : 'red'; ?>"><?php echo ( $status ) ? 'OK' : 'Connection failed'; ?></span></td>
 					</tr>
@@ -79,7 +81,7 @@ function hm_es_admin_screen() {
 			</form>
 		</div>
 
-		<?php if ( HMES_Logger::count_logs() ) : ?>
+		<?php if ( Logger::count_logs() ) : ?>
 
 			<?php $page = ( ! empty( $_GET['log_page'] ) ) ? intval( $_GET['log_page'] ) : 1; ?>
 
@@ -101,7 +103,7 @@ function hm_es_admin_screen() {
 					</tr>
 					</thead>
 					<tbody>
-					<?php foreach ( HMES_Logger::get_paginated_logs( $page, 20 ) as $entry_number => $log_item ) : ?>
+					<?php foreach ( Logger::get_paginated_logs( $page, 20 ) as $entry_number => $log_item ) : ?>
 						<tr>
 							<td class="td-id"><div><pre><?php echo $entry_number; ?></pre></div></td>
 							<td class="td-type"><div><pre><?php echo $log_item['type']; ?></pre></div></td>
@@ -117,7 +119,7 @@ function hm_es_admin_screen() {
 					</tbody>
 				</table>
 
-				<?php if ( ( $log_count = HMES_Logger::count_logs() ) > 20 ) : ?>
+				<?php if ( ( $log_count = Logger::count_logs() ) > 20 ) : ?>
 					<div class="hmes-log-table-pagination">
 						<span>Page</span>
 						<?php for ( $i = 1; $i < ( ( $log_count + 20 ) / 20 ); $i++ ) : ?>
@@ -147,32 +149,32 @@ function hm_es_process_admin_screen_form_submission() {
 		return;
 
 	if ( isset( $_POST['hm_es_host'] ) )
-		HMES_Configuration::set_default_host( str_replace( 'http://', '', sanitize_text_field( $_POST['hm_es_host'] ) ) );
+		Configuration::set_default_host( str_replace( 'http://', '', sanitize_text_field( $_POST['hm_es_host'] ) ) );
 
 	if ( isset( $_POST['hm_es_port'] ) )
-		HMES_Configuration::set_default_port( sanitize_text_field( $_POST['hm_es_port'] ) );
+		Configuration::set_default_port( sanitize_text_field( $_POST['hm_es_port'] ) );
 
-	if ( isset( $_POST['hm_es_protocol'] ) && array_key_exists( sanitize_text_field( $_POST['hm_es_protocol'] ), HMES_Configuration::get_supported_protocols() ) ) {
-		HMES_Configuration::set_default_protocol( sanitize_text_field( $_POST['hm_es_protocol'] ) );
+	if ( isset( $_POST['hm_es_protocol'] ) && array_key_exists( sanitize_text_field( $_POST['hm_es_protocol'] ), Configuration::get_supported_protocols() ) ) {
+		Configuration::set_default_protocol( sanitize_text_field( $_POST['hm_es_protocol'] ) );
 	}
 
 	if ( isset( $_POST['hm_es_is_enabled'] ) ) {
 
-		HMES_Configuration::set_is_enabled( (bool) sanitize_text_field( $_POST['hm_es_is_enabled'] ) );
+		Configuration::set_is_enabled( (bool) sanitize_text_field( $_POST['hm_es_is_enabled'] ) );
 	}
 
 	if ( ! empty( $_POST['hm_es_clear_logs'] ) ) {
-		HMES_Logger::set_logs( array() );
+		Logger::set_logs( array() );
 	}
 
 	if ( ! empty( $_POST['hm_es_reindex'] ) ) {
 
-		if ( HMES_ElasticSearch_Wrapper::get_instance()->is_connection_available() && HMES_ElasticSearch_Wrapper::get_instance()->is_index_created() ) {
+		if ( Wrapper::get_instance()->is_connection_available() && Wrapper::get_instance()->is_index_created() ) {
 
 			hm_es_delete_elastic_search_index();
 			hm_es_init_elastic_search_index();
 
-			foreach ( HMES_Type_Manager::get_types() as $type ) {
+			foreach ( Type_Manager::get_types() as $type ) {
 				$type->index_all();
 			}
 		}
@@ -186,7 +188,7 @@ function hm_es_process_admin_screen_form_submission() {
 /**
  * Enqueue scripts and styles for the HMES settings page
  */
-function hm_es_enqueue_admin_assets()  {
+function enqueue_admin_assets()  {
 
 	wp_enqueue_script( 'hmes-admin-scripts', plugin_dir_url( __FILE__ ) . 'assets/admin-scripts.js', array( 'jquery' ), false, true );
 	wp_enqueue_style( 'hmes-admin-scripts', plugin_dir_url( __FILE__ ) . 'assets/admin-styles.css' );

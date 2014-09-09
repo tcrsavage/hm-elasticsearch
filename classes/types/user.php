@@ -1,6 +1,8 @@
 <?php
 
-class HMES_User_Type extends HMES_Base_Type {
+namespace HMES\Types;
+
+class User extends Base {
 
 	var $name             = 'user';
 	var $index_hooks      = array( 'user_register', 'profile_update' );

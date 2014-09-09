@@ -1,6 +1,10 @@
 <?php
 
-abstract class HMES_Base_Type {
+namespace HMES\Types;
+use HMES\Wrapper;
+use HMES\Logger;
+
+abstract class Base {
 
 	var $name            = '';
 	var $client          = '';
@@ -70,15 +74,15 @@ abstract class HMES_Base_Type {
 	}
 
 	/**
-	 * Get the HMES_ElasticSearch_Wrapper, initialised with default index and type pre set
+	 * Get the Wrapper, initialised with default index and type pre set
 	 *
-	 * @return HMES_ElasticSearch_Wrapper|string
+	 * @return Wrapper|string
 	 */
 	function get_wrapper() {
 
 		if ( ! $this->wrapper ) {
 
-			$this->wrapper = HMES_ElasticSearch_Wrapper::get_instance( array( 'type' => $this->name ) );
+			$this->wrapper = Wrapper::get_instance( array( 'type' => $this->name ) );
 		}
 
 		return $this->wrapper;
@@ -252,7 +256,7 @@ abstract class HMES_Base_Type {
 
 		if ( count( $all ) > 1000 ) {
 
-			HMES_Logger::save_log( array(
+			\HMES\Logger::save_log( array(
 				'timestamp'      => time(),
 				'type'           => 'warning',
 				'index'          => $this->get_wrapper()->args['index'],
@@ -291,7 +295,7 @@ abstract class HMES_Base_Type {
 
 			$this->set_last_execute_failed_attempt( time() );
 
-			HMES_Logger::save_log( array(
+			Logger::save_log( array(
 				'timestamp'      => time(),
 				'type'           => 'warning',
 				'index'          => $this->get_wrapper()->args['index'],

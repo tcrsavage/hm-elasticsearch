@@ -1,6 +1,9 @@
 <?php
 
-class HMES_Post_Type extends HMES_Base_Type {
+
+namespace HMES\Types;
+
+class Post extends Base {
 
 	var $name             = 'post';
 	var $index_hooks      = array( 'edit_post', 'save_post', 'publish_post' );
