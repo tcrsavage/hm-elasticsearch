@@ -171,8 +171,8 @@ function hm_es_process_admin_screen_form_submission() {
 
 		if ( Wrapper::get_instance()->is_connection_available() && Wrapper::get_instance()->is_index_created() ) {
 
-			hm_es_delete_elastic_search_index();
-			hm_es_init_elastic_search_index();
+			delete_elastic_search_index();
+			init_elastic_search_index();
 
 			foreach ( Type_Manager::get_types() as $type ) {
 				$type->index_all();

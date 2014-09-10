@@ -1,6 +1,5 @@
 <?php
 
-
 namespace HMES\Types;
 
 class Post extends Base {
