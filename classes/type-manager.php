@@ -11,7 +11,7 @@ class Type_Manager {
 	 */
 	static function init_types() {
 
-		foreach ( hm_es_get_type_class_names() as $class_name ) {
+		foreach ( get_type_class_names() as $class_name ) {
 
 			$class = new $class_name();
 

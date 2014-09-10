@@ -27,7 +27,7 @@ function init_types() {
 	Type_Manager::init_types();
 }
 
-add_action( 'plugins_loaded', 'hm_es_init_types' );
+add_action( 'plugins_loaded', 'HMES\init_types' );
 
 /**
  * Get the list of HMES type classes by name
