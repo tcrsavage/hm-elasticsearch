@@ -7,54 +7,27 @@ class Logger {
 	static $max_logs = 500;
 
 	/**
-	 * Process a response from elasticsearch and create a log entry if there is an erroneous response
+	 * Log a failed request to elasticsearch
 	 *
-	 * @param $function
-	 * @param Wrapper $class
-	 * @param $payload
-	 * @param $response
+	 * @param int $page
+	 * @param int $per_page
+	 * @return array
 	 */
-	static function process_response( $function, Wrapper $class, $payload, $response ) {
+	static function log_failed_request( $url, $payload, $response ) {
 
-		if ( ! is_array( $response ) || empty( $response['error'] ) ) {
-			return;
+		//Elastic search response error messages are long - explode off semicolon to get the short error title
+		if ( ! empty( $response['error'] ) ) {
+			$exploded = explode( ';', $response['error'] );
+			$message  = reset( $exploded );
+		} else {
+			$message = '-';
 		}
 
-		$log_entry = array(
-			'timestamp'      => time(),
-			'type'           => 'error',
-			'index'          => $class->args['index'],
-			'document_type'  => ! empty( $class->args['type'] ) ? $class->args['type'] : '-',
-			'caller'         => $function,
-			'args'           => $payload,
-			'message'        => $response
-		);
-
-		self::save_log( $log_entry );
-
-	}
-
-	/**
-	 * Process an exception from the elasticsearch wrapper and create a log entry
-	 *
-	 * @param $function
-	 * @param Wrapper $class
-	 * @param $payload
-	 * @param \Exception $e
-	 */
-	static function process_exception( $function, Wrapper $class, $payload, \Exception $e ) {
-
-		$log_entry = array(
-			'timestamp'       => time(),
-			'type'            => 'error',
-			'index'           => $class->args['index'],
-			'document_type'   => ! empty( $class->args['type'] ) ? $class->args['type'] : '-',
-			'caller'          => $function,
-			'args'            => $payload,
-			'message'         => $e->getMessage()
-		);
-
-		self::save_log( $log_entry );
+		self::save_log( array(
+			'type'      => 'error',
+			'message'   => $message,
+			'data'      => array( 'url' => $url, 'payload' => $payload, 'response' => $response ),
+		) );
 	}
 
 	/**
@@ -118,6 +91,13 @@ class Logger {
 	 * @param $item
 	 */
 	static function save_log( $item ) {
+
+		$item = wp_parse_args( $item, array(
+			'type'      => 'notice',
+			'timestamp' => time(),
+			'message'   => '-',
+			'data'      => '-',
+		) );
 
 		$saved = self::get_logs();
 

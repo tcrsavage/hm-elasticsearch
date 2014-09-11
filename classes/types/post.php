@@ -156,6 +156,8 @@ class Post extends Base {
 			}
 		};
 
+		$item['meta'] = array();
+
 		return $item;
 	}
 

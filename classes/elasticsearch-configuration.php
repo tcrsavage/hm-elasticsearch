@@ -81,7 +81,7 @@ class Configuration {
 	 */
 	static function get_supported_protocols() {
 
-		return array( 'http' => 'HTTP', 'memcached' => 'Memcached' );
+		return array( 'http' => 'HTTP', 'https' => 'HTTPS' );
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 namespace HMES;
 
-add_action( 'admin_menu', 'hm_es_admin_screen' );
+add_action( 'admin_menu', 'HMES\admin_screen' );
 
 /**
  * Add a submenu page to settings for HMES
@@ -94,11 +94,8 @@ function admin_screen() {
 						<th>ID</th>
 						<th>Type</th>
 						<th>Date</th>
-						<th>Index</th>
-						<th>Doc Type</th>
-						<th>Caller</th>
-						<th>Args</th>
 						<th>Message</th>
+						<th>Data</th>
 						<th>Expand</th>
 					</tr>
 					</thead>
@@ -108,11 +105,9 @@ function admin_screen() {
 							<td class="td-id"><div><pre><?php echo $entry_number; ?></pre></div></td>
 							<td class="td-type"><div><pre><?php echo $log_item['type']; ?></pre></div></td>
 							<td class="td-date"><div><pre><?php echo date( 'Y-m-d H:i:s', $log_item['timestamp'] ); ?></pre></div></td>
-							<td class="td-index"><div><pre><?php echo $log_item['index']; ?></pre></div></td>
-							<td class="td-document-type"><div><pre><?php echo $log_item['document_type']; ?></pre></div></td>
-							<td class="td-caller"><div><pre><?php echo $log_item['caller']; ?></pre></div></td>
-							<td class="td-args"><div><pre><?php print_r( $log_item['args'] )?></pre></div></td>
 							<td class="td-message"><div><pre><?php print_r( $log_item['message'] )?></pre></div></td>
+							<td class="td-data"><div><pre><?php print_r( $log_item['data'] )?></pre></div></td>
+
 							<td class="expand"><div class="cell">+</div></td>
 						</tr>
 					<?php endforeach; ?>
@@ -135,15 +130,15 @@ function admin_screen() {
 	<?php
 	} );
 
-	add_action( 'load-'. $hook, 'hm_es_init_elastic_search_index', 9 );
-	add_action( 'load-'. $hook, 'hm_es_process_admin_screen_form_submission' );
-	add_action( 'load-'. $hook, 'hm_es_enqueue_admin_assets' );
+	add_action( 'load-'. $hook, '\\HMES\\init_elastic_search_index', 9 );
+	add_action( 'load-'. $hook, '\\HMES\\process_admin_screen_form_submission' );
+	add_action( 'load-'. $hook, '\\HMES\\enqueue_admin_assets' );
 }
 
 /**
  * Capture form submissions from the HMES settings page
  */
-function hm_es_process_admin_screen_form_submission() {
+function process_admin_screen_form_submission() {
 
 	if ( ! isset( $_POST['submit'] ) || ! wp_verify_nonce( $_POST['hm_es_settings'], 'hm_es_settings' ) )
 		return;

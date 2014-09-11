@@ -25,32 +25,18 @@
 	width: 20px;
 }
 
-.hmes-log-table tr .td-date {
-	width: 50px;
-}
-
 .hmes-log-table tr .td-type {
 	width: 40px;
 }
 
-.hmes-log-table tr .td-index {
-
-	width: 40px;
-}
-
-.hmes-log-table tr .td-document-type {
-	width: 65px;
-}
-
-.hmes-log-table tr .td-caller {
-	width: 120px;
-}
-
-.hmes-log-table tr .td-args {
-
-	max-width: 100px;
+.hmes-log-table tr .td-date {
+	width: 50px;
 }
 
 .hmes-log-table tr .td-message {
 	max-width: 250px;
+}
+
+.hmes-log-table tr .td-data {
+	max-width: 350px;
 }

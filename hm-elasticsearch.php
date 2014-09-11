@@ -11,9 +11,8 @@ Author URI: http://hmn.md/
 namespace HMES;
 
 require_once ( __DIR__ . '/hm-elasticsearch-admin.php' );
-
-include_dir( __DIR__ . '/classes' );
 include_dir( __DIR__ . '/lib/elasticsearch/src' );
+include_dir( __DIR__ . '/classes' );
 
 /**
  * Init ell HMES type classes on plugins_loaded hook
@@ -54,7 +53,9 @@ function init_elastic_search_index( $connection_args = array(), $index_creation_
 
 	$es = Wrapper::get_instance( $connection_args );
 
-	if ( ! $es->is_connection_available( array( 'log' => false ) ) ) {
+	$es->disable_logging();
+
+	if ( ! $es->is_connection_available() ) {
 		return false;
 	}
 
@@ -77,7 +78,9 @@ function delete_elastic_search_index( $connection_args = array(), $index_deletio
 
 	$es = Wrapper::get_instance( $connection_args );
 
-	if ( ! $es->is_connection_available( array( 'log' => false ) ) ) {
+	$es->disable_logging();
+
+	if ( ! $es->is_connection_available() ) {
 		return false;
 	}
 
@@ -113,3 +116,21 @@ function include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
 		}
 	}
 }
+//
+//add_action( 'init', function() {
+//
+//	$type = Type_Manager::get_type( 'post' );
+//
+//	$r = $type->search( array(
+//		"query" => array(
+//			'term' => array(
+//				'post_type' => 'page'
+//			)
+//		)
+//	) );
+//
+//	var_dump( $r );
+//
+//	exit;
+//
+//} );

@@ -101,7 +101,7 @@ abstract class Base {
 			return;
 		}
 
-		$this->get_wrapper()->index( $parsed, $parsed['ID'] );
+		$this->get_client()->index( $parsed, $parsed['ID'] );
 	}
 
 	/**
@@ -115,7 +115,7 @@ abstract class Base {
 			return;
 		}
 
-		$this->get_wrapper()->delete( $item_id );
+		$this->get_client()->delete( $item_id );
 	}
 
 	/**
@@ -127,7 +127,7 @@ abstract class Base {
 	 */
 	function search( $query, $options = array() ) {
 
-		return $this->get_wrapper()->search( $query, $options );
+		return $this->get_client()->search( $query, $options );
 	}
 
 	/**
@@ -144,7 +144,7 @@ abstract class Base {
 
 		if ( $args['bulk'] ) {
 
-			$this->get_wrapper()->begin();
+			$this->get_client()->begin();
 		}
 
 		foreach ( $items as $item ) {
@@ -154,7 +154,7 @@ abstract class Base {
 
 		if ( $args['bulk'] ) {
 
-			$this->get_wrapper()->commit();
+			$this->get_client()->commit();
 		}
 
 	}
@@ -173,7 +173,7 @@ abstract class Base {
 
 		if ( $args['bulk'] ) {
 
-			$this->get_wrapper()->begin();
+			$this->get_client()->begin();
 		}
 
 		foreach ( $items as $item ) {
@@ -183,7 +183,7 @@ abstract class Base {
 
 		if ( $args['bulk'] ) {
 
-			$this->get_wrapper()->commit();
+			$this->get_client()->commit();
 		}
 	}
 
@@ -297,19 +297,15 @@ abstract class Base {
 
 			Logger::save_log( array(
 				'timestamp'      => time(),
-				'type'           => 'warning',
-				'index'          => $this->get_wrapper()->args['index'],
-				'document_type'  => $this->get_wrapper()->args['type'],
-				'caller'         => 'execute_queued_actions',
-				'args'           => '-',
-				'message'        => 'Failed to execute syncing actions for ' . count( $this->get_queued_actions() ) . ' items. Saving for reattempt in 5 mins'
+				'message'        => 'Failed to execute syncing actions for ' . count( $this->get_queued_actions() ) . ' items. Saving for reattempt in 5 mins',
+				'data'           => array( 'document_type' => $this->name, 'queued_actions' => $this->get_queued_actions() )
 			) );
 
 		//else execute the actions now
 		} else {
 
 			//Begin a bulk transaction
-			$this->get_wrapper()->begin();
+			$this->get_wrapper()->get_client();
 
 			foreach ( $this->get_queued_actions() as $identifier => $object ) {
 				foreach ( $object as $action => $args ) {
@@ -318,7 +314,7 @@ abstract class Base {
 			}
 
 			//Finish the bulk transaction
-			$this->get_wrapper()->commit();
+			$this->get_wrapper()->get_client();
 
 			$this->clear_queued_actions();
 		}
