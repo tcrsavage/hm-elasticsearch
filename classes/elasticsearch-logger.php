@@ -61,7 +61,22 @@ class Logger {
 	 */
 	public static function get_logs() {
 
-		return get_option( 'hmes_logger_logs', array() );
+		$logs = get_option( 'hmes_logger_logs', array() );
+
+		//Log overflow, need to clear it
+		if ( ! is_array( $logs ) ) {
+
+			self::set_logs( array() );
+
+			self::save_log( array(
+				'message'   => 'There was a log overflow issue, logs have been automatically cleared',
+				'data'      => '-',
+			) );
+
+			$logs = get_option( 'hmes_logger_logs', array() );
+		}
+
+		return $logs;
 	}
 
 	/**
