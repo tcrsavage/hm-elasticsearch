@@ -12,20 +12,7 @@ class Post extends Base {
 		'updated_post_meta' => 'update_post_meta_callback',
 		'deleted_post_meta' => 'update_post_meta_callback',
 		'set_object_terms'  => 'set_object_terms_callback',
-		'edited_term'       => 'edited_term_callback',
 	);
-
-	/**
-	 * Called when a term is edited - triggers re-indexing of all posts in the term
-	 *
-	 * @param $term_id
-	 * @param $tt_id
-	 * @param $taxonomy
-	 */
-	function edited_term_callback( $term_id, $tt_id, $taxonomy ) {
-
-		$this->queue_action( 'index_all_in_term', $term_id, $args = array( 'taxonomy' => $taxonomy  ) );
-	}
 
 	/**
 	 * Called when post meta is added/deleted/edited - triggers re-indexing of the applicable post
@@ -77,50 +64,6 @@ class Post extends Base {
 	}
 
 	/**
-	 * Gets all posts in a specified term -  used to get all posts which apply to a recently edited term for reindexing
-	 *
-	 * @param $term_id
-	 * @param $args
-	 * @return array
-	 */
-	function get_all_in_term( $term_id, $args ) {
-
-		$items = $this->search( "taxonomies." . $args['taxonomy'] . '.term_id:' . $term_id );
-
-		$post_ids = array();
-
-		if ( empty( $items['hits']['hits'] ) ) {
-
-			return array();
-		}
-
-		foreach ( $items['hits']['hits'] as $hit ) {
-
-			$post_ids[] = $hit['_id'];
-		}
-
-		//Get full objects to avoid single queries for each post
-		$posts = get_posts( array(
-			'post_type'       => 'any',
-			'posts_per_page'  => -1,
-			'post__in'        => $post_ids,
-		) );
-
-		return $posts;
-	}
-
-	/**
-	 * Re-indexes all posts which are assigned to a given term - used to update all applicable posts when a term is modified
-	 *
-	 * @param $term_id
-	 * @param $args
-	 */
-	function index_all_in_term( $term_id, $args ) {
-
-		$this->index_items( $this->get_all_in_term( $term_id, $args ) );
-	}
-
-	/**
 	 * Parse an item for indexing, accepts post ID or post object
 	 *
 	 * @param $item
@@ -151,8 +94,12 @@ class Post extends Base {
 
 		foreach ( get_taxonomies() as $tax ) {
 
-			if ( $terms = wp_get_object_terms( $item['ID'], $tax ) ) {
-				$item['taxonomies'][$tax] = $terms;
+			$terms = get_the_terms( $item['ID'], $tax );
+
+			if ( $terms && is_array( $terms ) ) {
+				$item['taxonomies'][$tax] = array_map( function( $term ) {
+					return $term->term_id;
+				}, array_values( $terms ) );
 			}
 		};
 
