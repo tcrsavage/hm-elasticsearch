@@ -2,7 +2,7 @@
 
 namespace HMES;
 
-add_action( 'admin_menu', 'HMES\admin_screen' );
+add_action( 'admin_menu', '\\HMES\\admin_screen' );
 
 /**
  * Add a submenu page to settings for HMES
