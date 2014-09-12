@@ -4,6 +4,8 @@ namespace HMES;
 
 class Client_Abstraction extends \ElasticSearch\Client {
 
+	protected $transport_ref;
+
 	static function getTransports() {
 		return array(
 			//'http'  => 'ElasticSearch\\Transport\\HTTP',
@@ -59,13 +61,16 @@ class Client_Abstraction extends \ElasticSearch\Client {
 
 		$client = new self( $transport, $config['index'], $config['type']);
 
-		$client->config($config);
+		//hackery to allow access to the transport
+		$client->transport_ref = $transport;
+
+		$client->config( $config );
 
 		return $client;
 	}
 
 	public function getTransport() {
-		return $this->transport;
+		return $this->transport_ref;
 	}
 
 }

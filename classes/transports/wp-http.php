@@ -31,12 +31,18 @@ class WP_HTTP extends \ElasticSearch\Transport\HTTP {
 
 		$http       = new \WP_Http;
 		$protocol   = "http";
-		$requestURL = $protocol . "://" . $this->host . ':' . $this->port . $url;
+		$request_url = $protocol . "://" . $this->host . ':' . $this->port . $url;
 
-		$r = $http->request( $requestURL, array(
+		//For compatibility with original transports handling
+		if ( is_array( $payload ) && count( $payload ) > 0)
+			$body = json_encode( $payload );
+		else
+			$body = $payload;
+
+		$r = $http->request( $request_url, array(
 			'timeout'       => $this->getTimeout(),
 			'method'        => strtoupper( $method ),
-			'body'          => json_encode( $payload ),
+			'body'          => $body,
 			'sslverify'     => false,
 			'headers'       => array( 'Host' => $this->host . ':' . $this->port )
 		) );
@@ -46,7 +52,7 @@ class WP_HTTP extends \ElasticSearch\Transport\HTTP {
 			$data = array( 'error' => $r->get_error_message(), "code" => $r->get_error_code() );
 
 			if ( $this->is_logging_enabled ) {
-				Logger::log_failed_request( $requestURL, $payload, $data );
+				Logger::log_failed_request( $request_url, $method, $payload, $data );
 			}
 
 			return $data;
@@ -56,7 +62,7 @@ class WP_HTTP extends \ElasticSearch\Transport\HTTP {
 
 		if ( (int) $r['response']['code'] > 299 && $this->is_logging_enabled ) {
 
-			Logger::log_failed_request( $requestURL, $payload, $data );
+			Logger::log_failed_request( $request_url, $method, $payload, $data );
 		}
 
 		return $data;

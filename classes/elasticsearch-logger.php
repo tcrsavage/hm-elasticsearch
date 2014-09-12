@@ -13,7 +13,7 @@ class Logger {
 	 * @param int $per_page
 	 * @return array
 	 */
-	static function log_failed_request( $url, $payload, $response ) {
+	static function log_failed_request( $url, $method, $payload, $response ) {
 
 		//Elastic search response error messages are long - explode off semicolon to get the short error title
 		if ( ! empty( $response['error'] ) ) {
@@ -26,7 +26,7 @@ class Logger {
 		self::save_log( array(
 			'type'      => 'error',
 			'message'   => $message,
-			'data'      => array( 'url' => $url, 'payload' => $payload, 'response' => $response ),
+			'data'      => array( 'url' => $url, 'method' => $method, 'payload' => $payload, 'response' => $response ),
 		) );
 	}
 
