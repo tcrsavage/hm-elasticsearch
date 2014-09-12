@@ -45,7 +45,7 @@ function admin_screen() {
 						<th scope="row"><label for="hm_es_is_enabled">Enable Elastic Search Indexing</label></th>
 						<td>
 							<input type="hidden" name="hm_es_is_enabled" value="0" />
-							<input name="hm_es_is_enabled" type="checkbox" id="hm_es_is_enabled" <?php checked( Configuration::get_is_enabled() ); ?> value="1">
+							<input name="hm_es_is_enabled" type="checkbox" id="hm_es_is_enabled" <?php checked( Configuration::get_is_indexing_enabled() ); ?> value="1">
 						</td>
 					</tr>
 
@@ -155,7 +155,7 @@ function process_admin_screen_form_submission() {
 
 	if ( isset( $_POST['hm_es_is_enabled'] ) ) {
 
-		Configuration::set_is_enabled( (bool) sanitize_text_field( $_POST['hm_es_is_enabled'] ) );
+		Configuration::set_is_indexing_enabled( (bool) sanitize_text_field( $_POST['hm_es_is_enabled'] ) );
 	}
 
 	if ( ! empty( $_POST['hm_es_clear_logs'] ) ) {

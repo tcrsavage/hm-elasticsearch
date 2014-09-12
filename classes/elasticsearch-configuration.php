@@ -21,7 +21,7 @@ class Configuration {
 	 */
 	public static function get_default_host() {
 
-		return self::get_option( 'server_host', '' );
+		return apply_filters( 'hmes_default_host', self::get_option( 'server_host', '' ) );
 	}
 
 	/**
@@ -41,18 +41,9 @@ class Configuration {
 	 */
 	public static function get_default_port() {
 
-		return self::get_option( 'server_port', '' );
+		return apply_filters( 'hmes_default_port', self::get_option( 'server_port', '' ) );
 	}
 
-	/**
-	 * Set the default elasticsearch protocol address to be used by the elasticsearch API wrapper
-	 *
-	 * @return mixed|void
-	 */
-	public static function get_default_protocol() {
-
-		return self::get_option( 'server_protocol', 'http' );
-	}
 
 	/**
 	 * Get the default elasticsearch host protocol to be used by the elasticsearch API wrapper
@@ -62,6 +53,17 @@ class Configuration {
 	public static function set_default_protocol( $protocol ) {
 
 		self::set_option( 'server_protocol', $protocol );
+	}
+
+
+	/**
+	 * Set the default elasticsearch protocol address to be used by the elasticsearch API wrapper
+	 *
+	 * @return mixed|void
+	 */
+	public static function get_default_protocol() {
+
+		return apply_filters( 'hmes_default_host', self::get_option( 'server_protocol', 'http' ) );
 	}
 
 	public static function get_default_index_name() {
@@ -81,7 +83,16 @@ class Configuration {
 	 */
 	public static function get_supported_protocols() {
 
-		return array( 'http' => 'HTTP', 'https' => 'HTTPS' );
+		$protocols = array_keys( Client_Abstraction::getTransports() );
+
+		$protocols_with_name = array();
+
+		foreach ( $protocols as $protocol ) {
+
+			$protocols_with_name[$protocol] = strtoupper( $protocol );
+		}
+
+		return apply_filters( 'hmes_supported_protocols', $protocols_with_name );
 	}
 
 	/**
@@ -89,12 +100,11 @@ class Configuration {
 	 *
 	 * @param $bool
 	 */
-	public static function set_is_enabled( $bool ) {
+	public static function set_is_indexing_enabled( $bool ) {
 
 		$is_enabled = ( $bool ) ? '1' : '0';
 
 		self::set_option( 'is_enabled', $is_enabled );
-
 	}
 
 	/**
@@ -102,9 +112,9 @@ class Configuration {
 	 *
 	 * @return mixed|void
 	 */
-	public static function get_is_enabled() {
+	public static function get_is_indexing_enabled() {
 
-		return ( self::get_option( 'is_enabled', '0' ) );
+		return apply_filters( 'hmes_is_indexing_enabled', ( self::get_option( 'is_enabled', '0' ) ) );
 	}
 
 	/**

@@ -19,7 +19,7 @@ include_dir( __DIR__ . '/classes' );
  */
 function init_types() {
 
-	if ( ! Configuration::get_is_enabled() ) {
+	if ( ! Configuration::get_is_indexing_enabled() ) {
 		return;
 	}
 
