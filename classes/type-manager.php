@@ -4,7 +4,7 @@ namespace HMES;
 
 class Type_Manager {
 
-	public static $types = array();
+	protected static $types = array();
 
 	/**
 	 * Initialise the HMES type classes (verify setup and set hooks)
