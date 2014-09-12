@@ -59,7 +59,13 @@ class Wrapper {
 	public function get_client() {
 
 		if ( ! $this->client ) {
-			$this->client = Client_Abstraction::connection( $this->args );
+
+			//For some reason the Client accepts a 'host' argument but doesn't use it and instead uses a weird 'servers' arguemnt
+			$args = wp_parse_args( $this->args, array(
+				'servers' => $this->args['host'] . ':' . $this->args['port']
+			) );
+
+			$this->client = Client_Abstraction::connection( $args );
 		}
 
 		return $this->client;
