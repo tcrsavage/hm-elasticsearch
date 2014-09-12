@@ -6,14 +6,14 @@ use HMES\Logger;
 
 abstract class Base {
 
-	var $name            = '';
-	var $client          = '';
-	var $wrapper         = '';
-	var $items_per_page  = 1000;
-	var $index_hooks     = array();
-	var $delete_hooks    = array();
-	var $mappable_hooks  = array();
-	var $queued_actions  = array();
+	public $name            = '';
+	public $client          = '';
+	public $wrapper         = '';
+	public $items_per_page  = 1000;
+	public $index_hooks     = array();
+	public $delete_hooks    = array();
+	public $mappable_hooks  = array();
+	public $queued_actions  = array();
 
 	/**
 	 * Index callback, to be called when an item is added or edited in the database
@@ -22,7 +22,7 @@ abstract class Base {
 	 * @param array $args
 	 * @return mixed
 	 */
-	abstract function index_callback( $item, $args = array() );
+	public abstract function index_callback( $item, $args = array() );
 
 	/**
 	 * Delete callback - to be fired when an item is deleted from the database
@@ -31,7 +31,7 @@ abstract class Base {
 	 * @param array $args
 	 * @return mixed
 	 */
-	abstract function delete_callback( $item, $args = array()  );
+	public abstract function delete_callback( $item, $args = array()  );
 
 	/**
 	 * Parse an item for indexing (should support being supplied either an ID, or an item object/array
@@ -39,7 +39,7 @@ abstract class Base {
 	 * @param $item
 	 * @return mixed
 	 */
-	abstract function parse_item_for_index( $item, $args = array() );
+	public abstract function parse_item_for_index( $item, $args = array() );
 
 	/**
 	 * Get items of specific type to index (used when initialising index)
@@ -48,12 +48,12 @@ abstract class Base {
 	 * @param $per_page
 	 * @return mixed
 	 */
-	abstract function get_items( $page, $per_page );
+	public abstract function get_items( $page, $per_page );
 
 	/**
 	 * @return mixed
 	 */
-	function get_mapping() {
+	public function get_mapping() {
 
 		return false;
 	}
@@ -63,7 +63,7 @@ abstract class Base {
 	 *
 	 * @return \ElasticSearch\Client
 	 */
-	function get_client() {
+	public function get_client() {
 
 		if ( ! $this->client ) {
 
@@ -78,7 +78,7 @@ abstract class Base {
 	 *
 	 * @return Wrapper|string
 	 */
-	function get_wrapper() {
+	public function get_wrapper() {
 
 		if ( ! $this->wrapper ) {
 
@@ -93,7 +93,7 @@ abstract class Base {
 	 *
 	 * @param int|object $item
 	 */
-	function index_item( $item ) {
+	public function index_item( $item ) {
 
 		$parsed = $this->parse_item_for_index( $item );
 
@@ -109,7 +109,7 @@ abstract class Base {
 	 *
 	 * @param $item
 	 */
-	function delete_item( $item_id ) {
+	public function delete_item( $item_id ) {
 
 		if ( ! $item_id ) {
 			return;
@@ -125,7 +125,7 @@ abstract class Base {
 	 * @param array $options
 	 * @return array
 	 */
-	function search( $query, $options = array() ) {
+	public function search( $query, $options = array() ) {
 
 		return $this->get_client()->search( $query, $options );
 	}
@@ -136,7 +136,7 @@ abstract class Base {
 	 * @param array $items[int|object]
 	 * @param array $args ['bulk']
 	 */
-	function index_items( $items, $args = array() ) {
+	public function index_items( $items, $args = array() ) {
 
 		$args = wp_parse_args( $args, array(
 			'bulk'    => false
@@ -165,7 +165,7 @@ abstract class Base {
 	 * @param array $items
 	 * @param array $args ['bulk']
 	 */
-	function delete_items( $items, $args = array() ) {
+	public function delete_items( $items, $args = array() ) {
 
 		$args = wp_parse_args( $args, array(
 			'bulk'    => false

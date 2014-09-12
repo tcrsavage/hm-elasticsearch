@@ -6,10 +6,10 @@ namespace HMES\Types;
 
 class Term extends Base {
 
-	var $name             = 'term';
-	var $index_hooks      = array();
-	var $delete_hooks     = array();
-	var $mappable_hooks   = array(
+	public $name             = 'term';
+	public $index_hooks      = array();
+	public $delete_hooks     = array();
+	public $mappable_hooks   = array(
 		'create_term'    => 'update_term_callback',
 		'edited_terms'   => 'update_term_callback',
 		'delete_term'    => 'delete_term_callback'
@@ -22,7 +22,7 @@ class Term extends Base {
 	 * @param $tt_id
 	 * @param $taxonomy
 	 */
-	function update_term_callback( $term_id, $tt_id, $taxonomy ) {
+	public function update_term_callback( $term_id, $tt_id, $taxonomy ) {
 
 		$this->index_callback( $tt_id );
 	}
@@ -34,7 +34,7 @@ class Term extends Base {
 	 * @param $tt_id
 	 * @param $taxonomy
 	 */
-	function delete_term_callback( $term_id, $tt_id, $taxonomy ) {
+	public function delete_term_callback( $term_id, $tt_id, $taxonomy ) {
 
 		$this->delete_callback( $tt_id );
 	}
@@ -45,7 +45,7 @@ class Term extends Base {
 	 * @param $tt_id
 	 * @param array $args
 	 */
-	function index_callback( $tt_id, $args = array() ) {
+	public function index_callback( $tt_id, $args = array() ) {
 
 		$this->queue_action( 'index_item', $tt_id, $args );
 	}
@@ -56,7 +56,7 @@ class Term extends Base {
 	 * @param $tt_id
 	 * @param array $args
 	 */
-	function delete_callback( $tt_id, $args = array() ) {
+	public function delete_callback( $tt_id, $args = array() ) {
 
 		$this->queue_action( 'delete_item', $tt_id, $args );
 	}
@@ -68,7 +68,7 @@ class Term extends Base {
 	 * @param array $args
 	 * @return array|bool
 	 */
-	function parse_item_for_index( $item, $args = array() ) {
+	public function parse_item_for_index( $item, $args = array() ) {
 
 		//get a valid user object as array (populate if only id is supplied)
 		//terms are stored on tt_id because terms are stored independent of taxonomies in the database
@@ -100,7 +100,7 @@ class Term extends Base {
 	 * @param $tt_id
 	 * @return bool|object
 	 */
-	function get_term_from_tt_id( $tt_id ) {
+	public function get_term_from_tt_id( $tt_id ) {
 
 		global $wpdb;
 

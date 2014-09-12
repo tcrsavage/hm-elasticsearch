@@ -4,10 +4,10 @@ namespace HMES\Types;
 
 class User extends Base {
 
-	var $name             = 'user';
-	var $index_hooks      = array( 'user_register', 'profile_update' );
-	var $delete_hooks     = array( 'deleted_user' );
-	var $mappable_hooks   = array(
+	public $name             = 'user';
+	public $index_hooks      = array( 'user_register', 'profile_update' );
+	public $delete_hooks     = array( 'deleted_user' );
+	public $mappable_hooks   = array(
 		'added_user_meta'   => 'update_user_meta_callback',
 		'updated_user_meta' => 'update_user_meta_callback',
 		'deleted_user_meta' => 'update_user_meta_callback'
@@ -19,7 +19,7 @@ class User extends Base {
 	 * @param $meta_id
 	 * @param $user_id
 	 */
-	function update_user_meta_callback( $meta_id, $user_id ) {
+	public function update_user_meta_callback( $meta_id, $user_id ) {
 
 		$this->index_callback( $user_id );
 	}
@@ -30,7 +30,7 @@ class User extends Base {
 	 * @param $item
 	 * @param array $args
 	 */
-	function index_callback( $item, $args = array()  ) {
+	public function index_callback( $item, $args = array()  ) {
 
 		$user = get_userdata( $item );
 
@@ -47,7 +47,7 @@ class User extends Base {
 	 * @param $user_id
 	 * @param array $args
 	 */
-	function delete_callback( $user_id, $args = array()  ) {
+	public function delete_callback( $user_id, $args = array()  ) {
 
 		$this->queue_action( 'delete_item', $user_id );
 	}
@@ -59,7 +59,7 @@ class User extends Base {
 	 * @param array $args
 	 * @return array|bool
 	 */
-	function parse_item_for_index( $item, $args = array() ) {
+	public function parse_item_for_index( $item, $args = array() ) {
 
 		//get a valid user object as array (populate if only id is supplied)
 		if ( is_numeric( $item ) ) {
@@ -88,7 +88,7 @@ class User extends Base {
 	 * @param $per_page
 	 * @return array
 	 */
-	function get_items( $page, $per_page ) {
+	public function get_items( $page, $per_page ) {
 
 		$posts = get_users( array(
 			'offset' => ( $page > 0 ) ? $per_page * ( $page -1 ) : 0,

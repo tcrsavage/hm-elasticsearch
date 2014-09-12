@@ -4,12 +4,12 @@ namespace HMES;
 
 class Type_Manager {
 
-	static $types = array();
+	public static $types = array();
 
 	/**
 	 * Initialise the HMES type classes (verify setup and set hooks)
 	 */
-	static function init_types() {
+	public static function init_types() {
 
 		foreach ( get_type_class_names() as $class_name ) {
 
@@ -28,7 +28,7 @@ class Type_Manager {
 	 *
 	 * @return Types\Base[]
 	 */
-	static function get_types() {
+	public static function get_types() {
 
 		return self::$types;
 	}
@@ -39,7 +39,7 @@ class Type_Manager {
 	 * @param $type_name
 	 * @return Types\Base|bool
 	 */
-	static function get_type( $type_name ) {
+	public static function get_type( $type_name ) {
 
 		foreach ( self::get_types() as $type ) {
 
@@ -58,7 +58,7 @@ class Type_Manager {
 	 * @param $class
 	 * @throws \Exception
 	 */
-	static function verify_setup( $class ) {
+	protected static function verify_setup( $class ) {
 
 		if ( ! $class->name ) {
 			throw new \Exception( 'Type name must be defined ' . get_class( $class ) );
@@ -70,7 +70,7 @@ class Type_Manager {
 	 *
 	 * @param $class
 	 */
-	static function set_hooks( $class ) {
+	protected static function set_hooks( $class ) {
 
 		foreach ( $class->index_hooks as $hook ) {
 

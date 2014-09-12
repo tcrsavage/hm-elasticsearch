@@ -4,10 +4,10 @@ namespace HMES\Types;
 
 class Comment extends Base {
 
-	var $name             = 'comment';
-	var $index_hooks      = array( 'wp_insert_comment', 'edit_comment' );
-	var $delete_hooks     = array( 'deleted_comment' );
-	var $mappable_hooks   = array(
+	public $name             = 'comment';
+	public $index_hooks      = array( 'wp_insert_comment', 'edit_comment' );
+	public $delete_hooks     = array( 'deleted_comment' );
+	public $mappable_hooks   = array(
 		'added_comment_meta'   => 'update_comment_meta_callback',
 		'updated_comment_meta' => 'update_comment_meta_callback',
 		'deleted_comment_meta' => 'update_comment_meta_callback'
@@ -19,7 +19,7 @@ class Comment extends Base {
 	 * @param $meta_id
 	 * @param $user_id
 	 */
-	function update_comment_meta_callback( $meta_id, $user_id ) {
+	public function update_comment_meta_callback( $meta_id, $user_id ) {
 
 		$this->index_callback( $user_id );
 	}
@@ -30,7 +30,7 @@ class Comment extends Base {
 	 * @param $item
 	 * @param array $args
 	 */
-	function index_callback( $item, $args = array()  ) {
+	public function index_callback( $item, $args = array()  ) {
 
 		$comment = (array) get_comment( $item );
 
@@ -47,7 +47,7 @@ class Comment extends Base {
 	 * @param $user_id
 	 * @param array $args
 	 */
-	function delete_callback( $user_id, $args = array()  ) {
+	public function delete_callback( $user_id, $args = array()  ) {
 
 		$this->queue_action( 'delete_item', $user_id );
 	}
@@ -59,7 +59,7 @@ class Comment extends Base {
 	 * @param array $args
 	 * @return array|bool
 	 */
-	function parse_item_for_index( $item, $args = array() ) {
+	public function parse_item_for_index( $item, $args = array() ) {
 
 		//get a valid user object as array (populate if only id is supplied)
 		if ( is_numeric( $item ) ) {
@@ -91,7 +91,7 @@ class Comment extends Base {
 	 * @param $per_page
 	 * @return array
 	 */
-	function get_items( $page, $per_page ) {
+	public function get_items( $page, $per_page ) {
 
 		$comments = get_comments( array(
 			'offset' => ( $page > 0 ) ? $per_page * ( $page -1 ) : 0,

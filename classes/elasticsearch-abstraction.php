@@ -6,12 +6,26 @@ class Client_Abstraction extends \ElasticSearch\Client {
 
 	protected $transport_ref;
 
-	static function getTransports() {
+	/**
+	 * Get a list of supported transports by protocol
+	 *
+	 * @return array
+	 */
+	public static function getTransports() {
 		return array(
 			//'http'  => 'ElasticSearch\\Transport\\HTTP',
 			'http' => '\\HMES\\Transports\\WP_HTTP',
 			'https' => '\\HMES\\Transports\\WP_HTTP',
 		);
+	}
+
+	/**
+	 * Get the current transport object
+	 *
+	 * @return mixed
+	 */
+	public function getTransport() {
+		return $this->transport_ref;
 	}
 
 	/**
@@ -67,10 +81,6 @@ class Client_Abstraction extends \ElasticSearch\Client {
 		$client->config( $config );
 
 		return $client;
-	}
-
-	public function getTransport() {
-		return $this->transport_ref;
 	}
 
 }

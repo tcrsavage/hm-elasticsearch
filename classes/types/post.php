@@ -4,10 +4,10 @@ namespace HMES\Types;
 
 class Post extends Base {
 
-	var $name             = 'post';
-	var $index_hooks      = array( 'edit_post', 'save_post', 'publish_post' );
-	var $delete_hooks     = array( 'delete_post' );
-	var $mappable_hooks   = array(
+	public $name             = 'post';
+	public $index_hooks      = array( 'edit_post', 'save_post', 'publish_post' );
+	public $delete_hooks     = array( 'delete_post' );
+	public $mappable_hooks   = array(
 		'added_post_meta'   => 'update_post_meta_callback',
 		'updated_post_meta' => 'update_post_meta_callback',
 		'deleted_post_meta' => 'update_post_meta_callback',
@@ -20,7 +20,7 @@ class Post extends Base {
 	 * @param $meta_id
 	 * @param $post_id
 	 */
-	function update_post_meta_callback( $meta_id, $post_id ) {
+	public function update_post_meta_callback( $meta_id, $post_id ) {
 
 		$this->index_callback( $post_id );
 	}
@@ -30,7 +30,7 @@ class Post extends Base {
 	 *
 	 * @param $post_id
 	 */
-	function set_object_terms_callback( $post_id ) {
+	public function set_object_terms_callback( $post_id ) {
 
 		$this->index_callback( $post_id );
 	}
@@ -41,7 +41,7 @@ class Post extends Base {
 	 * @param $post_id
 	 * @param array $args
 	 */
-	function index_callback( $post_id, $args = array()  ) {
+	public function index_callback( $post_id, $args = array()  ) {
 
 		$post = (array) get_post( $post_id );
 
@@ -58,7 +58,7 @@ class Post extends Base {
 	 * @param $post_id
 	 * @param array $args
 	 */
-	function delete_callback( $post_id, $args = array()  ) {
+	public function delete_callback( $post_id, $args = array()  ) {
 
 		$this->queue_action( 'delete_item', $post_id );
 	}
@@ -70,7 +70,7 @@ class Post extends Base {
 	 * @param array $args
 	 * @return array|bool
 	 */
-	function parse_item_for_index( $item, $args = array() ) {
+	public function parse_item_for_index( $item, $args = array() ) {
 
 		//get a valid post object as array (populate if only id is supplied)
 		if ( is_numeric( $item ) ) {
@@ -115,7 +115,7 @@ class Post extends Base {
 	 * @param $per_page
 	 * @return array
 	 */
-	function get_items( $page, $per_page ) {
+	public function get_items( $page, $per_page ) {
 
 		$posts = get_posts( array(
 			'post_type'       => 'any',

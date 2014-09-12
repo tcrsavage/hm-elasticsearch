@@ -9,7 +9,7 @@ class Configuration {
 	 *
 	 * @param $host
 	 */
-	static function set_default_host( $host ) {
+	public static function set_default_host( $host ) {
 
 		self::set_option( 'server_host', $host );
 	}
@@ -19,7 +19,7 @@ class Configuration {
 	 *
 	 * @return mixed|void
 	 */
-	static function get_default_host() {
+	public static function get_default_host() {
 
 		return self::get_option( 'server_host', '' );
 	}
@@ -29,7 +29,7 @@ class Configuration {
 	 *
 	 * @param $port
 	 */
-	static function set_default_port( $port ) {
+	public static function set_default_port( $port ) {
 
 		self::set_option( 'server_port', $port );
 	}
@@ -39,7 +39,7 @@ class Configuration {
 	 *
 	 * @return mixed|void
 	 */
-	static function get_default_port() {
+	public static function get_default_port() {
 
 		return self::get_option( 'server_port', '' );
 	}
@@ -49,7 +49,7 @@ class Configuration {
 	 *
 	 * @return mixed|void
 	 */
-	static function get_default_protocol() {
+	public static function get_default_protocol() {
 
 		return self::get_option( 'server_protocol', 'http' );
 	}
@@ -59,17 +59,17 @@ class Configuration {
 	 *
 	 * @param $protocol
 	 */
-	static function set_default_protocol( $protocol ) {
+	public static function set_default_protocol( $protocol ) {
 
 		self::set_option( 'server_protocol', $protocol );
 	}
 
-	static function get_default_index_name() {
+	public static function get_default_index_name() {
 
 		return apply_filters( 'hmes_default_index_name', 'hmes' );
 	}
 
-	static function get_default_timeout() {
+	public static function get_default_timeout() {
 
 		return apply_filters( 'hmes_default_index_timeout', 10 );
 	}
@@ -79,7 +79,7 @@ class Configuration {
 	 *
 	 * @return array
 	 */
-	static function get_supported_protocols() {
+	public static function get_supported_protocols() {
 
 		return array( 'http' => 'HTTP', 'https' => 'HTTPS' );
 	}
@@ -89,7 +89,7 @@ class Configuration {
 	 *
 	 * @param $bool
 	 */
-	static function set_is_enabled( $bool ) {
+	public static function set_is_enabled( $bool ) {
 
 		$is_enabled = ( $bool ) ? '1' : '0';
 
@@ -102,7 +102,7 @@ class Configuration {
 	 *
 	 * @return mixed|void
 	 */
-	static function get_is_enabled() {
+	public static function get_is_enabled() {
 
 		return ( self::get_option( 'is_enabled', '0' ) );
 	}
@@ -113,7 +113,7 @@ class Configuration {
 	 * @param $name
 	 * @param $value
 	 */
-	static function set_option( $name, $value ) {
+	public static function set_option( $name, $value ) {
 
 		update_option( 'hmes_' . $name, $value );
 	}
@@ -125,7 +125,7 @@ class Configuration {
 	 * @param bool $default
 	 * @return mixed|void
 	 */
-	static function get_option( $name, $default = false ) {
+	public static function get_option( $name, $default = false ) {
 
 		return get_option( 'hmes_' . $name, $default );
 	}

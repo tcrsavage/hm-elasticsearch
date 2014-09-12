@@ -4,7 +4,7 @@ namespace HMES;
 
 class Logger {
 
-	static $max_logs = 500;
+	public static $max_logs = 500;
 
 	/**
 	 * Log a failed request to elasticsearch
@@ -13,7 +13,7 @@ class Logger {
 	 * @param int $per_page
 	 * @return array
 	 */
-	static function log_failed_request( $url, $method, $payload, $response ) {
+	public static function log_failed_request( $url, $method, $payload, $response ) {
 
 		//Elastic search response error messages are long - explode off semicolon to get the short error title
 		if ( ! empty( $response['error'] ) ) {
@@ -37,7 +37,7 @@ class Logger {
 	 * @param int $per_page
 	 * @return array
 	 */
-	static function get_paginated_logs( $page = 1, $per_page = 50 ) {
+	public static function get_paginated_logs( $page = 1, $per_page = 50 ) {
 
 		if ( ! $page || $page < 0 ) {
 			$page = 1;
@@ -59,7 +59,7 @@ class Logger {
 	 *
 	 * @return mixed|void
 	 */
-	static function get_logs() {
+	public static function get_logs() {
 
 		return get_option( 'hmes_logger_logs', array() );
 	}
@@ -69,7 +69,7 @@ class Logger {
 	 *
 	 * @param $logs
 	 */
-	static function set_logs( $logs ) {
+	public static function set_logs( $logs ) {
 
 		delete_option( 'hmes_logger_logs' );
 		add_option( 'hmes_logger_logs', $logs, '', 'no' );
@@ -80,7 +80,7 @@ class Logger {
 	 *
 	 * @return int
 	 */
-	static function count_logs() {
+	public static function count_logs() {
 
 		return count( self::get_logs( 'logs', array() ) );
 	}
@@ -90,7 +90,7 @@ class Logger {
 	 *
 	 * @param $item
 	 */
-	static function save_log( $item ) {
+	public static function save_log( $item ) {
 
 		$item = wp_parse_args( $item, array(
 			'type'      => 'notice',

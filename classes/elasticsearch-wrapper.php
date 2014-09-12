@@ -4,13 +4,13 @@ namespace HMES;
 
 class Wrapper {
 
-	var $connection           = false;
-	var $client               = false;
+	public $connection           = false;
+	public $client               = false;
 
-	var $server_address       = '';
-	var $server_port          = '';
+	public $server_address       = '';
+	public $server_port          = '';
 
-	function __construct( $args = array() ) {
+	public function __construct( $args = array() ) {
 
 		$this->args = wp_parse_args( $args, array(
 			'host'      => Configuration::get_default_host(),
@@ -27,16 +27,16 @@ class Wrapper {
 	 * @param array $args
 	 * @return Wrapper
 	 */
-	static function get_instance( $args = array() ) {
+	public static function get_instance( $args = array() ) {
 
 		return new self ( $args );
 	}
 
-	function disable_logging() {
+	public function disable_logging() {
 		$this->get_connection()->disable_logging();
 	}
 
-	function enable_logging() {
+	public function enable_logging() {
 
 		$this->get_connection()->enable_logging();
 	}
@@ -46,7 +46,7 @@ class Wrapper {
 	 *
 	 * @return bool|Transports\WP_HTTP
 	 */
-	function get_connection() {
+	public function get_connection() {
 
 		return $this->get_client()->getTransport();
 	}
@@ -56,7 +56,7 @@ class Wrapper {
 	 *
 	 * @return bool|Client_Abstraction
 	 */
-	function get_client() {
+	public function get_client() {
 
 		if ( ! $this->client ) {
 			$this->client = Client_Abstraction::connection( $this->args );
@@ -70,7 +70,7 @@ class Wrapper {
 	 *
 	 * @return array
 	 */
-	function get_status() {
+	public function get_status() {
 
 		$r = $this->get_connection()->request( array( '_status' ) );
 
@@ -82,7 +82,7 @@ class Wrapper {
 	 *
 	 * @return bool
 	 */
-	function is_connection_available( $args = array() ) {
+	public function is_connection_available( $args = array() ) {
 
 		if ( ! $this->args['host'] || ! $this->args['port'] ) {
 			return false;
@@ -101,7 +101,7 @@ class Wrapper {
 	 *
 	 * @return bool
 	 */
-	function is_index_created( $args = array() ) {
+	public function is_index_created( $args = array() ) {
 
 		if ( ! $this->args['host'] || ! $this->args['port'] || ! $this->args['index'] ) {
 			return false;
@@ -118,7 +118,7 @@ class Wrapper {
 	 * @param array $args
 	 * @return array
 	 */
-	function create_index( $args = array() ) {
+	public function create_index( $args = array() ) {
 
 		$r = $this->get_connection()->request( '', 'PUT', $args );
 
@@ -131,7 +131,7 @@ class Wrapper {
 	 * @param array $args
 	 * @return array|bool
 	 */
-	function delete_index( $args = array() ) {
+	public function delete_index( $args = array() ) {
 
 		$r = $this->get_connection()->request( '', 'DELETE', $args );
 
