@@ -9,6 +9,13 @@ This plugin adds automatic indexing capabilities and elastic search client wrapp
 - Adds convenient wrappers to your document types with low level search API
 - Logs bad requests and errors into a dedicated database stored log
 
+###Requirements
+
+- PHP >= 5.3
+- WordPress >= 3.8 (probably works on older versions too)
+- Functioning WordPress Cron (some hosts do not support WordPress cron)
+- An elasticsearch server
+
 ###Setup
 
 1. Set up your elasticsearch server (https://gist.github.com/wingdspur/2026107)
