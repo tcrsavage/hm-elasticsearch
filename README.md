@@ -20,7 +20,7 @@ This plugin adds automatic indexing capabilities and elastic search client wrapp
 
 ###Running queries
 
-<?php
+```
 $type = \HMES\Type_Manager::get_type( 'post' );
 
 //Get published posts which were authored by author ID=1 queried by post_title, post_content contains 'My', 'test', 'post'
