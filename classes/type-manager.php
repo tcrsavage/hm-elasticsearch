@@ -79,32 +79,16 @@ class Type_Manager {
 		foreach ( $class->index_hooks as $hook ) {
 
 			add_action( $hook, array( $class, 'index_callback' ), 10, 5 );
-
-			add_action( $hook, function() use ( $hook ) {
-
-				error_log( 'index_callback - from: ' . $hook );
-			} );
 		}
 
 		foreach ( $class->delete_hooks as $hook ) {
 
 			add_action( $hook, array( $class, 'delete_callback' ), 10, 5 );
-
-			add_action( $hook, function() use ( $hook ) {
-
-				error_log( 'delete_callback - from: ' . $hook );
-			} );
-
 		}
 
 		foreach ( $class->mappable_hooks as $hook => $function ) {
 
 			add_action( $hook, array( $class, $function ), 10, 5 );
-
-			add_action( $hook, function() use ( $hook ) {
-
-				error_log( 'custom_callback - from: ' . $hook );
-			} );
 		}
 
 		add_action( 'shutdown', array( $class, 'execute_queued_actions' ), 10, 5 );
