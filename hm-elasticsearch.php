@@ -64,7 +64,7 @@ function init_elastic_search_index( $connection_args = array(), $index_creation_
 }
 
 /**
- * Init elasticsearch for given connection and index/type args
+ * Delete elasticsearch for given connection and index/type args
  *
  * @param array $connection_args
  * @param array $index_deletion_args
