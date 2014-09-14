@@ -93,17 +93,9 @@ class Comment extends Base {
 	 */
 	public function get_items( $page, $per_page ) {
 
-		$comments = get_comments( array(
-			'offset' => ( $page > 0 ) ? $per_page * ( $page -1 ) : 0,
-			'number' => $per_page
-		) );
+		global $wpdb;
 
-		//make sure ID is a parameter, we want a common parameter for the object id across types
-		foreach ( $comments as $key => $comment ) {
-
-			$comments[$key] = (array) $comment;
-			$comments[$key]['ID'] = $comments[$key]['comment_ID'];
-		}
+		$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->comments ORDER BY comment_ID ASC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $comments;
 	}

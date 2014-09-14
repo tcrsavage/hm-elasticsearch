@@ -75,13 +75,17 @@ class Term extends Base {
 		if ( is_numeric( $item ) ) {
 			$tt_id      = $item;
 			$item       = (array) $this->get_term_from_tt_id( $item );
-			$item['ID'] = $tt_id;
+
+			if ( $item ) {
+				$item['ID'] = $tt_id;
+			}
+
 		} else {
 			$item       = (array) $item;
 			$item['ID'] = $item['term_taxonomy_id'];
 		}
 
-		if ( empty( $item['ID'] ) ) {
+		if ( empty( $item['term_taxonomy_id'] ) ) {
 			return false;
 		}
 
@@ -132,7 +136,9 @@ class Term extends Base {
 
 		global $wpdb;
 
-		$tt_ids = $wpdb->get_col( $wpdb->prepare( "SELECT term_taxonomy_id FROM $wpdb->term_taxonomy ORDER BY term_taxonomy_id ASC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, ( $page > 0 ) ? $page * $per_page : $per_page ) );
+		$taxonomies = get_taxonomies();
+
+		$tt_ids = $wpdb->get_col( $wpdb->prepare( "SELECT term_taxonomy_id FROM $wpdb->term_taxonomy WHERE taxonomy IN ('" . join("', '", $taxonomies ) . "') ORDER BY term_taxonomy_id ASC LIMIT %d,%d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $tt_ids;
 	}
@@ -146,9 +152,11 @@ class Term extends Base {
 	 */
 	function get_items_count() {
 
+		$taxonomies = get_taxonomies();
+
 		global $wpdb;
 
-		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->term_taxonomy" );
+		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->term_taxonomy WHERE taxonomy IN ('" . join("', '", $taxonomies ) . "')" );
 
 		return (int) $r;
 	}

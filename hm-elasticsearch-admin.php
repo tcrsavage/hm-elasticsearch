@@ -102,7 +102,7 @@ function admin_screen() {
 						<tr valign="top">
 							<th scope="row"><label for="hm_es_reindex_<?php echo $type->name; ?>">Indexing</label></th>
 							<td>
-								<input type="button" id="hm_es_reindex_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="hm-es-reindex-submit" value="Reindex" />
+								<input type="button" id="hm_es_reindex_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="button hm-es-reindex-submit" value="Reindex" />
 							</td>
 						</tr>
 					</tbody>
@@ -244,6 +244,7 @@ add_action( 'wp_ajax_hmes_refresh_index', function() {
 	$type_name = sanitize_text_field( $_POST['type_name'] );
 
 	Type_Manager::get_type( $type_name )->set_is_doing_full_index( true );
+	Type_Manager::get_type( $type_name )->delete_all_indexed_items();
 
 	wp_schedule_single_event( time(), 'hmes_reindex_types_cron', array( 'type_name' => $type_name, 'timestamp' => time() ) );
 

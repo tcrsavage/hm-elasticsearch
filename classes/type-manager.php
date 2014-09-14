@@ -72,6 +72,10 @@ class Type_Manager {
 	 */
 	protected static function set_hooks( $class ) {
 
+		if ( ! Configuration::get_is_indexing_enabled() ) {
+			return;
+		}
+
 		foreach ( $class->index_hooks as $hook ) {
 
 			add_action( $hook, array( $class, 'index_callback' ), 10, 5 );

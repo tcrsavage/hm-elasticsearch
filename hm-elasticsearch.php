@@ -19,10 +19,6 @@ include_dir( __DIR__ . '/classes' );
  */
 function init_types() {
 
-	if ( ! Configuration::get_is_indexing_enabled() ) {
-		return;
-	}
-
 	Type_Manager::init_types();
 }
 
@@ -133,6 +129,18 @@ function reindex_types( $type_names ) {
 }
 
 add_action( 'init', function() {
+
+//	var_dump( get_taxonomies() );
+//
+////	$t = Type_Manager::get_type( 'term' );
+////
+////	var_dump( $t->get_term_from_tt_id( 124 ) );
+////	exit;
+////
+////	$t->index_all();
+//
+//
+//	exit;
 
 //	foreach( Type_Manager::get_types() as $type ) {
 //

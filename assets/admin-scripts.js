@@ -80,27 +80,29 @@ HMESIndexTypeManager = new function() {
 
 			data = jQuery.parseJSON( data );
 
-			var string = ( data.is_doing_full_index ) ? 'Indexing ' : 'Ready ';
-			string += '(' + data.indexed_count + ' of ' + data.database_count + ' indexed)';
-
-			var newClass = '';
+			var newClass, string = '';
 
 			if ( data.error ) {
 
+				string = data.error;
 				newClass = 'status-error';
 
 			} else if ( data.is_doing_full_index ) {
 
+				string = 'Indexing ' + '(' + data.indexed_count + ' of ' + data.database_count + ' indexed)';
 				newClass = 'status-warning';
 
 			} else {
 
+				string = 'Ready ' + '(' + data.indexed_count + ' of ' + data.database_count + ' indexed)';
 				newClass = 'status-ok';
 			}
 
 			if ( ! data.error ) {
 
-				element.css( 'width', ( ( data.indexed_count / data.database_count ) * 100 ) + '%' );
+				var width = ( ( data.indexed_count / data.database_count ) * 100 );
+
+				element.css( 'width', ( ( width <= 100 ) ? width : 100 ) + '%' );
 			}
 
 			messageElement.html( string );
@@ -123,5 +125,4 @@ HMESIndexTypeManager = new function() {
 
 		} );
 	};
-
 }

@@ -48,11 +48,7 @@ class Post extends Base {
 		$post = (array) $post;
 
 		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
-		if ( ! in_array( $new_status, get_post_stati( array( 'exclude_from_search' => false ) ) ) ) {
-
-			$this->delete_callback( $post['ID'] );
-
-		} else if ( ! in_array( $new_status, get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
+		if ( ! in_array( $new_status, get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
 
 			$this->delete_callback( $post['ID'] );
 
@@ -77,12 +73,7 @@ class Post extends Base {
 		}
 
 		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
-		if ( ! in_array( $post['post_status'], get_post_stati( array( 'exclude_from_search' => false ) ) ) ) {
-
-			return;
-		}
-
-		if ( ! in_array( $post['post_status'], get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
+		if ( ! in_array( $post['post_type'], get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
 
 			return;
 		}
@@ -155,12 +146,11 @@ class Post extends Base {
 	 */
 	public function get_items( $page, $per_page ) {
 
-		$posts = get_posts( array(
-			'post_type'       => 'any',
-			'post_status'     => 'all',
-			'posts_per_page'  => $per_page,
-			'paged'           => $page
-		) );
+		global $wpdb;
+
+		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
+
+		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') ORDER BY ID ASC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $posts;
 	}
@@ -178,11 +168,10 @@ class Post extends Base {
 
 		//wp query only queries for posts which are set to exclude_from_search->false, so honor that here
 		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
-		$in_search_post_stati = get_post_stati( array('exclude_from_search' => false ) );
 
-		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') AND post_status IN ('" . join("', '", $in_search_post_stati ) . "')" );
+		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "')" );
 
-		return (int) $r +1 ;
+		return (int) $r;
 	}
 
 }

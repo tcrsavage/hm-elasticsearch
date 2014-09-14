@@ -209,6 +209,14 @@ abstract class Base {
 		$this->delete_all_indexed_items();
 
 		while ( $has_items ) {
+
+			global $wp_object_cache;
+
+			//clear object cache local cache to avoid memory overflow
+			if ( ! empty( $wp_object_cache->cache ) ) {
+				$wp_object_cache->cache = array();
+			}
+
 			$items = $this->get_items( $page, $this->items_per_page );
 
 			if ( $items ) {
@@ -395,7 +403,7 @@ abstract class Base {
 
 	}
 
-	private function delete_all_indexed_items() {
+	public function delete_all_indexed_items() {
 
 		$wrapper = $this->get_wrapper();
 
