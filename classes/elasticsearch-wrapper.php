@@ -60,7 +60,7 @@ class Wrapper {
 
 		if ( ! $this->client ) {
 
-			//For some reason the Client accepts a 'host' argument but doesn't use it and instead uses a weird 'servers' arguemnt
+			//For some reason the Client accepts a 'host' argument but doesn't use it and instead uses a weird 'servers' argument
 			$args = wp_parse_args( $this->args, array(
 				'servers' => $this->args['host'] . ':' . $this->args['port']
 			) );
@@ -126,7 +126,7 @@ class Wrapper {
 	 */
 	public function create_index( $args = array() ) {
 
-		$r = $this->get_connection()->request( '', 'PUT', $args );
+		$r = $this->get_connection()->request( array( '/', $this->args['index'] ), 'PUT', $args );
 
 		return $r;
 	}
@@ -139,7 +139,7 @@ class Wrapper {
 	 */
 	public function delete_index( $args = array() ) {
 
-		$r = $this->get_connection()->request( '', 'DELETE', $args );
+		$r = $this->get_connection()->request( array( '/', $this->args['index'] ), 'DELETE', $args );
 
 		return $r;
 	}

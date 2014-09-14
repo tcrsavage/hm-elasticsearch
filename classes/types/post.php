@@ -8,10 +8,11 @@ class Post extends Base {
 	public $index_hooks      = array( 'edit_post', 'save_post', 'publish_post' );
 	public $delete_hooks     = array( 'delete_post' );
 	public $mappable_hooks   = array(
-		'added_post_meta'   => 'update_post_meta_callback',
-		'updated_post_meta' => 'update_post_meta_callback',
-		'deleted_post_meta' => 'update_post_meta_callback',
-		'set_object_terms'  => 'set_object_terms_callback',
+		'added_post_meta'        => 'update_post_meta_callback',
+		'updated_post_meta'      => 'update_post_meta_callback',
+		'deleted_post_meta'      => 'update_post_meta_callback',
+		'set_object_terms'       => 'set_object_terms_callback',
+		'transition_post_status' => 'transition_post_status_callback',
 	);
 
 	/**
@@ -36,6 +37,32 @@ class Post extends Base {
 	}
 
 	/**
+	 * Hook in on transition post status and check if the new status is one we can index, if so - index, if not, delete
+	 *
+	 * @param $new_status
+	 * @param $old_status
+	 * @param $post
+	 */
+	public function transition_post_status_callback( $new_status, $old_status, $post ) {
+
+		$post = (array) $post;
+
+		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
+		if ( ! in_array( $new_status, get_post_stati( array( 'exclude_from_search' => false ) ) ) ) {
+
+			$this->delete_callback( $post['ID'] );
+
+		} else if ( ! in_array( $new_status, get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
+
+			$this->delete_callback( $post['ID'] );
+
+		} else {
+
+			$this->index_callback( $post['ID'] );
+		}
+	}
+
+	/**
 	 * Queue the indexing of an item - called when a post is modified or added to the database
 	 *
 	 * @param $post_id
@@ -46,6 +73,17 @@ class Post extends Base {
 		$post = (array) get_post( $post_id );
 
 		if ( ! $post ) {
+			return;
+		}
+
+		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
+		if ( ! in_array( $post['post_status'], get_post_stati( array( 'exclude_from_search' => false ) ) ) ) {
+
+			return;
+		}
+
+		if ( ! in_array( $post['post_status'], get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
+
 			return;
 		}
 
@@ -119,12 +157,32 @@ class Post extends Base {
 
 		$posts = get_posts( array(
 			'post_type'       => 'any',
-			'post_status'     => 'publish',
+			'post_status'     => 'all',
 			'posts_per_page'  => $per_page,
 			'paged'           => $page
 		) );
 
 		return $posts;
+	}
+
+	/*
+	 * Get an integer count of the number of items which can potentially be indexed in the database
+	 *
+	 * Should serve to return a count which matches the same number of items which can be obtained from use of the get_items method
+	 *
+	 * @return int
+	 */
+	function get_items_count() {
+
+		global $wpdb;
+
+		//wp query only queries for posts which are set to exclude_from_search->false, so honor that here
+		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
+		$in_search_post_stati = get_post_stati( array('exclude_from_search' => false ) );
+
+		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') AND post_status IN ('" . join("', '", $in_search_post_stati ) . "')" );
+
+		return (int) $r +1 ;
 	}
 
 }

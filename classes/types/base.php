@@ -9,7 +9,7 @@ abstract class Base {
 	public $name            = '';
 	public $client          = '';
 	public $wrapper         = '';
-	public $items_per_page  = 1000;
+	public $items_per_page  = 100;
 	public $index_hooks     = array();
 	public $delete_hooks    = array();
 	public $mappable_hooks  = array();
@@ -49,6 +49,16 @@ abstract class Base {
 	 * @return mixed
 	 */
 	public abstract function get_items( $page, $per_page );
+
+
+	/*
+	 * Get an integer count of the number of items which can potentially be indexed in the database
+	 *
+	 * Should serve to return a count which matches the same number of items which can be obtained from use of the get_items method
+	 *
+	 * @return int
+	 */
+	public abstract function get_items_count();
 
 	/**
 	 * @return mixed
@@ -195,6 +205,9 @@ abstract class Base {
 		$has_items = true;
 		$page = 1;
 
+		$this->set_is_doing_full_index( true );
+		$this->delete_all_indexed_items();
+
 		while ( $has_items ) {
 			$items = $this->get_items( $page, $this->items_per_page );
 
@@ -206,6 +219,8 @@ abstract class Base {
 
 			$page++;
 		}
+
+		$this->set_is_doing_full_index( false );
 	}
 
 	/**
@@ -336,5 +351,54 @@ abstract class Base {
 	function set_last_execute_failed_attempt() {
 
 		update_option( 'hmes_' . $this->name . '_last_failed_execute_actions_attempt', time() );
+	}
+
+	function set_is_doing_full_index( $bool ) {
+
+		if ( $bool ) {
+			update_option( 'hmes_' . $this->name . '_is_doing_full_index', time() );
+		} else {
+
+			delete_option( 'hmes_' . $this->name . '_is_doing_full_index' );
+		}
+
+	}
+
+	function get_is_doing_full_index() {
+
+		$val = get_option( 'hmes_' . $this->name . '_is_doing_full_index', 0 );
+
+		return strtotime( '-30 minutes', time() ) < $val;
+	}
+
+	/*
+	 *
+	 */
+	function get_status() {
+
+		$response = array();
+
+		$count = $this->get_client()->request( '_count' );
+
+		if ( empty( $count['error'] ) ) {
+			$response['indexed_count'] = $count['count'];
+		} else {
+			$response['error'] = $count['error'];
+			$response['indexed_count'] = 0;
+		}
+
+		$response['database_count'] = $this->get_items_count();
+
+		$response['is_doing_full_index'] = $this->get_is_doing_full_index();
+
+		return $response;
+
+	}
+
+	private function delete_all_indexed_items() {
+
+		$wrapper = $this->get_wrapper();
+
+		$this->get_client()->request( array( '/', $wrapper->args['index'], $this->name ), 'DELETE' );
 	}
 }

@@ -98,4 +98,20 @@ class User extends Base {
 		return $posts;
 	}
 
+	/*
+	 * Get an integer count of the number of items which can potentially be indexed in the database
+	 *
+	 * Should serve to return a count which matches the same number of items which can be obtained from use of the get_items method
+	 *
+	 * @return int
+	 */
+	function get_items_count() {
+
+		global $wpdb;
+
+		$r = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->users" );
+
+		return (int) $r;
+	}
+
 }

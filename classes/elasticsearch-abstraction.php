@@ -82,5 +82,4 @@ class Client_Abstraction extends \ElasticSearch\Client {
 
 		return $client;
 	}
-
 }
