@@ -164,7 +164,7 @@ function admin_screen() {
 
 			<?php endif; ?>
 
-			<p class="alignleft"><span class="description">Up to <?php echo Logger::$max_logs; ?> log entries can be stored, older logs will be automatically deleted</span></p>
+			<p class="alignleft"><span class="description">Up to <?php echo Logger::get_max_logs(); ?> log entries can be stored, older logs will be automatically deleted</span></p>
 
 		</div>
 	<?php

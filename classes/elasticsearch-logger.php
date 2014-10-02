@@ -4,7 +4,16 @@ namespace HMES;
 
 class Logger {
 
-	public static $max_logs = 500;
+	/**
+	 * Get the max logs count
+	 *
+	 * @return int
+	 */
+	static function get_max_logs() {
+
+		return \HMES\Configuration::get_default_max_logs();
+
+	}
 
 	/**
 	 * Log a failed request to elasticsearch
@@ -124,8 +133,8 @@ class Logger {
 			$saved[] = $item;
 		}
 
-		if ( count( $saved ) > self::$max_logs ) {
-			$saved = array_slice( $saved, -self::$max_logs, self::$max_logs, true );
+		if ( count( $saved ) > self::get_max_logs() ) {
+			$saved = array_slice( $saved, -self::get_max_logs(), self::get_max_logs(), true );
 		}
 
 		self::set_logs( $saved );

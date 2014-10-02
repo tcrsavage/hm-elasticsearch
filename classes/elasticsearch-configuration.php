@@ -63,7 +63,7 @@ class Configuration {
 	 */
 	public static function get_default_protocol() {
 
-		return apply_filters( 'hmes_default_host', self::get_option( 'server_protocol', 'http' ) );
+		return apply_filters( 'hmes_default_protocol', self::get_option( 'server_protocol', 'http' ) );
 	}
 
 	public static function get_default_index_name() {
@@ -71,9 +71,25 @@ class Configuration {
 		return apply_filters( 'hmes_default_index_name', 'hmes' );
 	}
 
+
+	/**
+	 * Get the default elasticsearch connection timeout
+	 *
+	 * @return int
+	 */
 	public static function get_default_timeout() {
 
 		return apply_filters( 'hmes_default_index_timeout', 10 );
+	}
+
+	/**
+	 * Get the default maximum log count
+	 *
+	 * @return int
+	 */
+	public static function get_default_max_logs() {
+
+		return apply_filters( 'hmes_defauilt_max_logs', 50 );
 	}
 
 	/**
