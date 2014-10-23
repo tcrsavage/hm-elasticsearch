@@ -298,6 +298,7 @@ abstract class Base {
 	 */
 	function execute_queued_actions() {
 
+		//Only execute actions if something was updated in the current thread - avoids slowing page loads on front end
 		if ( ! $this->queued_actions ) {
 			return;
 		}
@@ -356,9 +357,9 @@ abstract class Base {
 	/**
 	 * Set the last timestamp at which 'execute_queued_actions' failed to complete due to a server issue
 	 */
-	function set_last_execute_failed_attempt() {
+	function set_last_execute_failed_attempt( $time ) {
 
-		update_option( 'hmes_' . $this->name . '_last_failed_execute_actions_attempt', time() );
+		update_option( 'hmes_' . $this->name . '_last_failed_execute_actions_attempt', $time );
 	}
 
 	function set_is_doing_full_index( $bool ) {
