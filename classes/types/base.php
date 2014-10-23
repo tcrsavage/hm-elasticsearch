@@ -273,11 +273,9 @@ abstract class Base {
 	/**
 	 * Save queued sync actions to the database, is called when 'execute_queued_actions' fails to connect to the ES server correctly
 	 */
-	function save_queued_actions() {
+	function save_actions( $actions ) {
 
-		$all = $this->get_queued_actions();
-
-		if ( count( $all ) > 1000 ) {
+		if ( count( $actions ) > 1000 ) {
 
 			\HMES\Logger::save_log( array(
 				'timestamp'      => time(),
@@ -286,15 +284,13 @@ abstract class Base {
 				'document_type'  => $this->get_wrapper()->args['type'],
 				'caller'         => 'save_queued_actions',
 				'args'           => '-',
-				'message'        => 'Saved actions buffer overflow. Too many actions have been saved for later syncing. (' . count( $all ) . ' items)'
+				'message'        => 'Saved actions buffer overflow. Too many actions have been saved for later syncing. (' . count( $actions ) . ' items)'
 			) );
 
-			$all = array_slice( $all, -1000, 1000, true );
+			$actions = array_slice( $actions, -1000, 1000, true );
 		}
 
-		$this->clear_queued_actions();
-
-		update_option( 'hmes_queued_actions_' . $this->name, $all );
+		update_option( 'hmes_queued_actions_' . $this->name, $actions );
 	}
 
 	/**
@@ -302,19 +298,26 @@ abstract class Base {
 	 */
 	function execute_queued_actions() {
 
-		if ( ! $this->get_queued_actions() ) {
+		//Clear actions so other threads don't pick them up
+		$queued_actions = $this->get_queued_actions();
+		$this->clear_queued_actions();
+
+		if ( ! $queued_actions ) {
+
 			return;
 		}
 
 		//If we failed to execute actions in the last 5minutes, don't bother trying to connect again, just save queued actions and return
 		if ( $this->get_last_execute_failed_attempt() > strtotime( '-5 minutes' ) ) {
 
-			$this->save_queued_actions();
+			$this->save_actions( $queued_actions );
+
 			return;
 
 		///If we can't get a connection at the moment, save the queued actions for processing later
 		} else if ( ! $this->get_wrapper()->is_connection_available() || ! $this->get_wrapper()->is_index_created() ) {
-			$this->save_queued_actions();
+
+			$this->save_actions( $queued_actions );
 
 			$this->set_last_execute_failed_attempt( time() );
 
@@ -328,18 +331,16 @@ abstract class Base {
 		} else {
 
 			//Begin a bulk transaction
-			$this->get_wrapper()->get_client();
+			$this->get_wrapper()->get_client()->begin();
 
-			foreach ( $this->get_queued_actions() as $identifier => $object ) {
+			foreach ( $queued_actions as $identifier => $object ) {
 				foreach ( $object as $action => $args ) {
 					$this->$action( $identifier, $args );
 				}
 			}
 
 			//Finish the bulk transaction
-			$this->get_wrapper()->get_client();
-
-			$this->clear_queued_actions();
+			$this->get_wrapper()->get_client()->commit();
 		}
 	}
 
