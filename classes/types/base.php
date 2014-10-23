@@ -300,12 +300,12 @@ abstract class Base {
 
 		//Clear actions so other threads don't pick them up
 		$queued_actions = $this->get_queued_actions();
-		$this->clear_queued_actions();
 
 		if ( ! $queued_actions ) {
-
 			return;
 		}
+
+		$this->clear_queued_actions();
 
 		//If we failed to execute actions in the last 5minutes, don't bother trying to connect again, just save queued actions and return
 		if ( $this->get_last_execute_failed_attempt() > strtotime( '-5 minutes' ) ) {
