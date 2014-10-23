@@ -298,13 +298,12 @@ abstract class Base {
 	 */
 	function execute_queued_actions() {
 
-		//Clear actions so other threads don't pick them up
-		$queued_actions = $this->get_queued_actions();
-
-		if ( ! $queued_actions ) {
+		if ( ! $this->queued_actions ) {
 			return;
 		}
 
+		//Clear actions so other threads don't pick them up
+		$queued_actions = $this->get_queued_actions();
 		$this->clear_queued_actions();
 
 		//If we failed to execute actions in the last 5minutes, don't bother trying to connect again, just save queued actions and return
