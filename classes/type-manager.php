@@ -115,8 +115,6 @@ class Type_Manager {
 
 	public static function execute_index_cron() {
 
-		error_log( 'executing cron' );
-
 		if ( ! Configuration::get_is_indexing_enabled() ) {
 			return;
 		}
