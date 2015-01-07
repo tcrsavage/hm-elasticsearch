@@ -21,7 +21,9 @@ class Configuration {
 	 */
 	public static function get_default_host() {
 
-		return apply_filters( 'hmes_default_host', self::get_option( 'server_host', '' ) );
+		$current = defined( 'HMES_HOST' ) ? HMES_HOST : self::get_option( 'server_host', '' );
+
+		return apply_filters( 'hmes_default_host', $current );
 	}
 
 	/**
@@ -41,7 +43,9 @@ class Configuration {
 	 */
 	public static function get_default_port() {
 
-		return apply_filters( 'hmes_default_port', self::get_option( 'server_port', '' ) );
+		$current = defined( 'HMES_PORT' ) ? HMES_PORT : self::get_option( 'server_port', '' );
+
+		return apply_filters( 'hmes_default_port', $current );
 	}
 
 
@@ -68,9 +72,10 @@ class Configuration {
 
 	public static function get_default_index_name() {
 
-		return apply_filters( 'hmes_default_index_name', 'hmes' );
-	}
+		$current = defined( 'HMES_INDEX_NAME' ) ? HMES_INDEX_NAME : 'hmes';
 
+		return apply_filters( 'hmes_default_index_name', $current );
+	}
 
 	/**
 	 * Get the default elasticsearch connection timeout
@@ -130,7 +135,9 @@ class Configuration {
 	 */
 	public static function get_is_indexing_enabled() {
 
-		return apply_filters( 'hmes_is_indexing_enabled', ( self::get_option( 'is_enabled', '0' ) ) );
+		$current = defined( 'HMES_IS_INDEXING_ENABLED' ) ? HMES_IS_INDEXING_ENABLED : self::get_option( 'is_enabled', '0' );
+
+		return (bool) apply_filters( 'hmes_is_indexing_enabled', $current );
 	}
 
 	/**

@@ -2,6 +2,8 @@
 
 namespace HMES;
 
+use HMES\Types\Base;
+
 class Type_Manager {
 
 	protected static $types = array();
@@ -21,6 +23,8 @@ class Type_Manager {
 
 			self::$types[] = $class;
 		}
+
+		self::init_cron();
 	}
 
 	/**
@@ -70,7 +74,7 @@ class Type_Manager {
 	 *
 	 * @param $class
 	 */
-	protected static function set_hooks( $class ) {
+	protected static function set_hooks( Base $class ) {
 
 		if ( ! Configuration::get_is_indexing_enabled() ) {
 			return;
@@ -91,6 +95,36 @@ class Type_Manager {
 			add_action( $hook, array( $class, $function ), 10, 5 );
 		}
 
-		add_action( 'shutdown', array( $class, 'execute_queued_actions' ), 10, 5 );
+		add_action( 'shutdown',  array( $class, 'save_actions' ) );
+	}
+
+	protected static function init_cron() {
+
+		if ( ! Configuration::get_is_indexing_enabled() ) {
+			return;
+		}
+
+		add_action( 'hmes_update_index_cron', array( 'HMES\Type_Manager', 'execute_index_cron' ), 10, 5 );
+
+		if ( wp_next_scheduled( 'hmes_update_index_cron' ) ) {
+			return;
+		}
+
+		wp_schedule_event( time(), 'minutes_10', 'hmes_update_index_cron' );
+	}
+
+	public static function execute_index_cron() {
+
+		error_log( 'executing cron' );
+
+		if ( ! Configuration::get_is_indexing_enabled() ) {
+			return;
+		}
+
+		foreach ( self::get_types() as $type ) {
+
+			$type->execute_queued_actions();
+		}
+
 	}
 }

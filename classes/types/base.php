@@ -58,6 +58,9 @@ abstract class Base {
 	 *
 	 * @return int
 	 */
+	/**
+	 * @return mixed
+	 */
 	public abstract function get_items_count();
 
 	/**
@@ -238,7 +241,7 @@ abstract class Base {
 	 * @param $identifier
 	 * @param array $args
 	 */
-	function queue_action( $action, $identifier, $args = array() ) {
+	function add_action( $action, $identifier, $args = array() ) {
 
 		//keep actions in order of when they were last set
 		if ( isset( $this->queued_actions[$identifier][$action] ) ) {
@@ -249,33 +252,51 @@ abstract class Base {
 	}
 
 	/**
-	 * Get all actions that have been queued, e.g. index items/delete items
+	 * Get all indexing actions queued by the current thread
 	 *
 	 * @return array
 	 */
-	function get_queued_actions() {
+	function get_actions() {
+
+		return $this->queued_actions;
+	}
+
+	/**
+	 * Aquire a save lock to update the global actions queue with those set in the current thread
+	 *
+	 * @return bool
+	 */
+	function acquire_save_lock() {
+
+		return wp_cache_add( 'hmes_queued_actions_save_lock_' . $this->name, '1', '', 60 );
+	}
+
+	/**
+	 * Clear the save lock after global actions have been updated
+	 */
+	function clear_save_lock() {
+
+		wp_cache_delete( 'hmes_queued_actions_save_lock_' . $this->name );
+	}
+
+	/**
+	 * Get all actions that have been queued, e.g. index items/delete items
+	 *
+	 */
+	function save_actions() {
+
+		$attempts = 0;
+
+		//Wait until other threads have finished saving their queued items (failsafe)
+		while ( ! $this->acquire_save_lock() && $attempts < 10 ) {
+			$attempts++;
+			time_nanosleep( 0, 500000000 );
+		}
 
 		$saved  = get_option( 'hmes_queued_actions_' . $this->name, array() );
 		$all    = array_replace_recursive( $saved, $this->queued_actions );
 
-		return $all;
-	}
-
-	/**
-	 * Clear all queued actions, is executed after 'execute_queued_actions' completes successfully
-	 */
-	function clear_queued_actions() {
-
-		$this->queued_actions = array();
-		delete_option(  'hmes_queued_actions_' . $this->name );
-	}
-
-	/**
-	 * Save queued sync actions to the database, is called when 'execute_queued_actions' fails to connect to the ES server correctly
-	 */
-	function save_actions( $actions ) {
-
-		if ( count( $actions ) > 1000 ) {
+		if ( count( $all ) > 10000 ) {
 
 			\HMES\Logger::save_log( array(
 				'timestamp'      => time(),
@@ -284,13 +305,44 @@ abstract class Base {
 				'document_type'  => $this->get_wrapper()->args['type'],
 				'caller'         => 'save_queued_actions',
 				'args'           => '-',
-				'message'        => 'Saved actions buffer overflow. Too many actions have been saved for later syncing. (' . count( $actions ) . ' items)'
+				'message'        => 'Saved actions buffer overflow. Too many actions have been saved for later syncing. (' . count( $all ) . ' items)'
 			) );
 
-			$actions = array_slice( $actions, -1000, 1000, true );
+			$all = array_slice( $all, -10000, 10000, true );
 		}
 
-		update_option( 'hmes_queued_actions_' . $this->name, $actions );
+		update_option( 'hmes_queued_actions_' . $this->name, $all );
+
+		$this->clear_save_lock();
+	}
+
+	/**
+	 * Get the array of global indexing actions which should be performed
+	 *
+	 * @return array
+	 */
+	function get_saved_actions() {
+
+		return get_option( 'hmes_queued_actions_' . $this->name );
+	}
+
+	/**
+	 * Clear the saved indexing actions
+	 *
+	 */
+	function clear_saved_actions() {
+
+		delete_option( 'hmes_queued_actions_' . $this->name );
+	}
+
+	/**
+	 * Get the hook name for the queued actions execution cron
+	 *
+	 * @return string
+	 */
+	function get_execute_cron_hook() {
+
+		return 'hmes_execute_queued_actions_cron_' . $this->name;
 	}
 
 	/**
@@ -298,32 +350,19 @@ abstract class Base {
 	 */
 	function execute_queued_actions() {
 
-		//Only execute actions if something was updated in the current thread - avoids slowing page loads on front end
-		if ( ! $this->queued_actions ) {
+		$actions = $this->get_saved_actions();
+		$this->clear_saved_actions();
+
+		if ( ! $actions ) {
 			return;
 		}
 
-		//Clear actions so other threads don't pick them up
-		$queued_actions = $this->get_queued_actions();
-		$this->clear_queued_actions();
-
-		//If we failed to execute actions in the last 5minutes, don't bother trying to connect again, just save queued actions and return
-		if ( $this->get_last_execute_failed_attempt() > strtotime( '-5 minutes' ) ) {
-
-			$this->save_actions( $queued_actions );
-
-			return;
-
 		///If we can't get a connection at the moment, save the queued actions for processing later
-		} else if ( ! $this->get_wrapper()->is_connection_available() || ! $this->get_wrapper()->is_index_created() ) {
-
-			$this->save_actions( $queued_actions );
-
-			$this->set_last_execute_failed_attempt( time() );
+		if ( ! $this->get_wrapper()->is_connection_available() || ! $this->get_wrapper()->is_index_created() ) {
 
 			Logger::save_log( array(
 				'timestamp'      => time(),
-				'message'        => 'Failed to execute syncing actions for ' . count( $this->get_queued_actions() ) . ' items. Saving for reattempt in 5 mins',
+				'message'        => 'Failed to execute syncing actions for ' . count( $this->get_queued_actions() ) . ' items.',
 				'data'           => array( 'document_type' => $this->name, 'queued_actions' => $this->get_queued_actions() )
 			) );
 
@@ -333,7 +372,7 @@ abstract class Base {
 			//Begin a bulk transaction
 			$this->get_wrapper()->get_client()->begin();
 
-			foreach ( $queued_actions as $identifier => $object ) {
+			foreach ( $actions as $identifier => $object ) {
 				foreach ( $object as $action => $args ) {
 					$this->$action( $identifier, $args );
 				}
@@ -345,23 +384,10 @@ abstract class Base {
 	}
 
 	/**
-	 * Get the last timestamp at which 'execute_queued_actions' failed to complete due to a server issue
+	 * Set a flag when we are performing a full index
 	 *
-	 * @return int
+	 * @param $bool
 	 */
-	function get_last_execute_failed_attempt() {
-
-		return get_option( 'hmes_' . $this->name . '_last_failed_execute_actions_attempt', 0 );
-	}
-
-	/**
-	 * Set the last timestamp at which 'execute_queued_actions' failed to complete due to a server issue
-	 */
-	function set_last_execute_failed_attempt( $time ) {
-
-		update_option( 'hmes_' . $this->name . '_last_failed_execute_actions_attempt', $time );
-	}
-
 	function set_is_doing_full_index( $bool ) {
 
 		if ( $bool ) {
@@ -373,6 +399,11 @@ abstract class Base {
 
 	}
 
+	/**
+	 * Check if we are performing a full index
+	 *
+	 * @return bool
+	 */
 	function get_is_doing_full_index() {
 
 		$val = get_option( 'hmes_' . $this->name . '_is_doing_full_index', 0 );
@@ -380,8 +411,10 @@ abstract class Base {
 		return strtotime( '-30 minutes', time() ) < $val;
 	}
 
-	/*
+	/**
+	 * Get the status of the index
 	 *
+	 * @return array
 	 */
 	function get_status() {
 
@@ -404,6 +437,9 @@ abstract class Base {
 
 	}
 
+	/**
+	 * Delete all items from the index
+	 */
 	public function delete_all_indexed_items() {
 
 		$wrapper = $this->get_wrapper();

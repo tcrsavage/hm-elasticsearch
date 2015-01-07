@@ -78,7 +78,7 @@ class Post extends Base {
 			return;
 		}
 
-		$this->queue_action( 'index_item', $post_id );
+		$this->add_action( 'index_item', $post_id );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Post extends Base {
 	 */
 	public function delete_callback( $post_id, $args = array()  ) {
 
-		$this->queue_action( 'delete_item', $post_id );
+		$this->add_action( 'delete_item', $post_id );
 	}
 
 	/**
@@ -119,6 +119,9 @@ class Post extends Base {
 			$item['meta'][$meta_key] = reset( $meta_array );
 		}
 
+		$item['post_date_timestamp'] = strtotime( $item['post_date'] );
+		$item['post_modified_timestamp'] = strtotime( $item['post_modified'] );
+
 		$item['taxonomies'] = array();
 
 		foreach ( get_taxonomies() as $tax ) {
@@ -131,6 +134,8 @@ class Post extends Base {
 				}, array_values( $terms ) );
 			}
 		};
+
+		$item = apply_filters( 'hmes_parsed_item_for_index_' . $this->name, $item );
 
 		return $item;
 	}

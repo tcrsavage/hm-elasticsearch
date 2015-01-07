@@ -38,7 +38,7 @@ class User extends Base {
 			return;
 		}
 
-		$this->queue_action( 'index_item', $item );
+		$this->add_action( 'index_item', $item );
 	}
 
 	/**
@@ -49,7 +49,7 @@ class User extends Base {
 	 */
 	public function delete_callback( $user_id, $args = array()  ) {
 
-		$this->queue_action( 'delete_item', $user_id );
+		$this->add_action( 'delete_item', $user_id );
 	}
 
 	/**
@@ -77,6 +77,8 @@ class User extends Base {
 		foreach ( $item['meta'] as $meta_key => $meta_array ) {
 			$item['meta'][$meta_key] = reset( $meta_array );
 		}
+
+		$item = apply_filters( 'hmes_parsed_item_for_index_' . $this->name, $item );
 
 		return $item;
 	}

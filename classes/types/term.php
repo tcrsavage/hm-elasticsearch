@@ -47,7 +47,7 @@ class Term extends Base {
 	 */
 	public function index_callback( $tt_id, $args = array() ) {
 
-		$this->queue_action( 'index_item', $tt_id, $args );
+		$this->add_action( 'index_item', $tt_id, $args );
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Term extends Base {
 	 */
 	public function delete_callback( $tt_id, $args = array() ) {
 
-		$this->queue_action( 'delete_item', $tt_id, $args );
+		$this->add_action( 'delete_item', $tt_id, $args );
 	}
 
 	/**
@@ -94,6 +94,8 @@ class Term extends Base {
 		if ( ! $item['taxonomy_data'] ) {
 			return false;
 		}
+
+		$item = apply_filters( 'hmes_parsed_item_for_index_' . $this->name, $item );
 
 		return $item;
 	}

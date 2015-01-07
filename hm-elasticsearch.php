@@ -127,3 +127,12 @@ function reindex_types( $type_names ) {
 		}
 	}
 }
+
+
+add_filter( 'cron_schedules', function( $intervals ) {
+
+	$intervals['minutes_10'] = array('interval' => 10*60, 'display' => 'Once 10 minutes');
+
+	return $intervals;
+
+} );
