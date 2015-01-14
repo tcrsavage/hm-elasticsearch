@@ -94,7 +94,8 @@ class User extends Base {
 
 		$posts = get_users( array(
 			'offset' => ( $page > 0 ) ? $per_page * ( $page -1 ) : 0,
-			'number' => $per_page
+			'number' => $per_page,
+			'blog_id' => null
 		) );
 
 		return $posts;
