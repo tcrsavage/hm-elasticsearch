@@ -75,6 +75,8 @@ class Comment extends Base {
 			return false;
 		}
 
+		$item['comment_date_timestamp'] = strtotime( $item['comment_date'] );
+
 		$item['meta'] = get_metadata( 'comment', (int) $item['ID'], '', true );
 
 		foreach ( $item['meta'] as $meta_key => $meta_array ) {
