@@ -47,12 +47,8 @@ class Post extends Base {
 
 		$post = (array) $post;
 
-		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
-		if ( ! in_array( $new_status, get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
-
-			$this->delete_callback( $post['ID'] );
-
-		} else {
+		//Make sure it's ok to index this post
+		if ( in_array( $post['post_type'], get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
 
 			$this->index_callback( $post['ID'] );
 		}
@@ -74,7 +70,6 @@ class Post extends Base {
 
 		//Make sure it's ok to index this post - if it can't be searched by wp_query, skip it
 		if ( ! in_array( $post['post_type'], get_post_types( array( 'exclude_from_search' => false ) ) ) ) {
-
 			return;
 		}
 
