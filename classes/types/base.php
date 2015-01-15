@@ -366,6 +366,9 @@ abstract class Base {
 				'data'           => array( 'document_type' => $this->name, 'queued_actions' => $this->get_queued_actions() )
 			) );
 
+			$this->queued_actions = $actions;
+			$this->save_actions();
+
 		//else execute the actions now
 		} else {
 
