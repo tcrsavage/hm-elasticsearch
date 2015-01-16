@@ -264,11 +264,7 @@ abstract class Base {
 			$r = $this->search( array(
 				'fields' => [],
 				'query' => array(
-					'ids' => array(
-						'values' => array_map( function( $item ) {
-							return $item->ID;
-						}, $items )
-					),
+					'ids' => array( 'values' => $items )
 				),
 				'size'   => $this->items_per_page,
 				'from'   =>  $this->items_per_page * ( $page - 1 ),
