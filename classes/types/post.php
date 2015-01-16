@@ -148,7 +148,7 @@ class Post extends Base {
 
 		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
 
-		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') ORDER BY ID ASC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
+		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') ORDER BY ID DESC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $posts;
 	}
