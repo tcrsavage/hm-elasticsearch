@@ -136,7 +136,7 @@ class Post extends Base {
 	}
 
 	/**
-	 * Get paginated comments for use by index_all base class method
+	 * Get paginated posts for use by index_all base class method
 	 *
 	 * @param $page
 	 * @param $per_page
@@ -149,6 +149,24 @@ class Post extends Base {
 		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
 
 		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') ORDER BY ID DESC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
+
+		return $posts;
+	}
+
+	/**
+	 * Get paginated post ids for use by index_pending base class method
+	 *
+	 * @param $page
+	 * @param $per_page
+	 * @return array
+	 */
+	public function get_items_ids( $page, $per_page ) {
+
+		global $wpdb;
+
+		$in_search_post_types = get_post_types( array('exclude_from_search' => false ) );
+
+		$posts = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type IN ('" . join("', '", $in_search_post_types ) . "') ORDER BY ID DESC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $posts;
 	}

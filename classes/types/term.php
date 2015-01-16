@@ -145,6 +145,18 @@ class Term extends Base {
 		return $tt_ids;
 	}
 
+	/**
+	 * Get paginated term_taxonomy_ids for use by index_pending base class method
+	 *
+	 * @param $page
+	 * @param $per_page
+	 * @return mixed
+	 */
+	function get_items_ids( $page, $per_page ) {
+
+		return $this->get_items( $page, $per_page );
+	}
+
 	/*
 	 * Get an integer count of the number of items which can potentially be indexed in the database
 	 *

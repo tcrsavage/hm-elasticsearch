@@ -103,6 +103,7 @@ function admin_screen() {
 							<th scope="row"><label for="hm_es_reindex_<?php echo $type->name; ?>">Indexing</label></th>
 							<td>
 								<input type="button" id="hm_es_reindex_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="button hm-es-reindex-submit" value="Reindex" />
+								<input type="button" id="hm_es_resync_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="button hm-es-resync-submit" value="Resync" />
 							</td>
 						</tr>
 					</tbody>
@@ -236,7 +237,7 @@ add_action( 'wp_ajax_hmes_get_type_status', function() {
 } );
 
 //Capture ajax request to refresh a type in the elasticsearch index
-add_action( 'wp_ajax_hmes_refresh_index', function() {
+add_action( 'wp_ajax_hmes_init_index', function() {
 
 	if ( ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'hm_es_settings' ) )
 		exit;
@@ -247,6 +248,22 @@ add_action( 'wp_ajax_hmes_refresh_index', function() {
 	Type_Manager::get_type( $type_name )->delete_all_indexed_items();
 
 	wp_schedule_single_event( time(), 'hmes_reindex_types_cron', array( 'type_name' => $type_name, 'timestamp' => time() ) );
+
+	exit;
+
+} );
+
+//Capture ajax request to refresh a type in the elasticsearch index
+add_action( 'wp_ajax_hmes_resync_index', function() {
+
+	if ( ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'hm_es_settings' ) )
+		exit;
+
+	$type_name = sanitize_text_field( $_POST['type_name'] );
+
+	Type_Manager::get_type( $type_name )->set_is_doing_full_index( true );
+
+	wp_schedule_single_event( time(), 'hmes_resync_types_cron', array( 'type_name' => $type_name, 'timestamp' => time() ) );
 
 	exit;
 
@@ -263,4 +280,17 @@ add_action( 'hmes_reindex_types_cron', function( $type_name ) {
 	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
 	reindex_types( array( $type_name ) );
+} );
+
+add_action( 'hmes_resync_types_cron', function( $type_name ) {
+
+	// This can take a long time and consume a lot of memory
+	if ( ini_get( 'max_execution_time' ) < 3600 ) {
+
+		set_time_limit( 3600 );
+	}
+
+	@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
+
+	resync_types( array( $type_name ) );
 } );

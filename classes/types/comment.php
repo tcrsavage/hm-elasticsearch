@@ -99,7 +99,23 @@ class Comment extends Base {
 
 		global $wpdb;
 
-		$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->comments ORDER BY comment_ID ASC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
+		$comments = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->comments ORDER BY comment_ID DESC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
+
+		return $comments;
+	}
+
+	/**
+	 * Get paginated comments ids for use by index_pending base class method
+	 *
+	 * @param $page
+	 * @param $per_page
+	 * @return array
+	 */
+	public function get_items_ids( $page, $per_page ) {
+
+		global $wpdb;
+
+		$comments = $wpdb->get_results( $wpdb->prepare( "SELECT comment_ID FROM $wpdb->comments ORDER BY comment_ID DESC LIMIT %d, %d", ( $page > 0 ) ? $per_page * ( $page -1 ) : 0, $per_page ) );
 
 		return $comments;
 	}

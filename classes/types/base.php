@@ -50,6 +50,14 @@ abstract class Base {
 	 */
 	public abstract function get_items( $page, $per_page );
 
+	/**
+	 * Get item ids of specific type to index (used when adding pending items to the index)
+	 *
+	 * @param $page
+	 * @param $per_page
+	 * @return mixed
+	 */
+	public abstract function get_items_ids( $page, $per_page );
 
 	/*
 	 * Get an integer count of the number of items which can potentially be indexed in the database
@@ -225,6 +233,61 @@ abstract class Base {
 			if ( $items ) {
 				$this->index_items( $items, array( 'bulk' => true ) );
 			} else {
+				$has_items = false;
+			}
+
+			$page++;
+		}
+
+		$this->set_is_doing_full_index( false );
+	}
+
+	function index_pending() {
+
+		$this->set_is_doing_full_index( true );
+
+		$has_items = true;
+		$page = 1;
+		$total_items = $this->get_items_count();
+
+		while ( $has_items ) {
+
+			global $wp_object_cache;
+
+			//clear object cache local cache to avoid memory overflow
+			if ( ! empty( $wp_object_cache->cache ) ) {
+				$wp_object_cache->cache = array();
+			}
+
+			$items = $this->get_items_ids( $page, $this->items_per_page );
+
+			$r = $this->search( array(
+				'fields' => [],
+				'query' => array(
+					'ids' => array(
+						'values' => array_map( function( $item ) {
+							return $item->ID;
+						}, $items )
+					),
+				),
+				'size'   => $this->items_per_page,
+				'from'   =>  $this->items_per_page * ( $page - 1 ),
+			) );
+
+			if ( ! empty( $r['hits']['total'] ) ) {
+				$hits_count = $r['hits']['total'];
+			} else {
+				$hits_count = 0;
+			}
+
+			$cur_count =  $this->get_client()->request( '_count' );
+			$cur_count = ! empty( $cur_count['count'] ) ? $cur_count['count'] : 0;
+
+			if ( $hits_count < count( $items ) ) {
+				$this->index_items( $this->get_items( $page, $this->items_per_page ), array( 'bulk' => true ) );
+			}
+
+			if ( ! $items || ( $cur_count >= $total_items ) ) {
 				$has_items = false;
 			}
 

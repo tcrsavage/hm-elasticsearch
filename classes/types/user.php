@@ -101,6 +101,25 @@ class User extends Base {
 		return $posts;
 	}
 
+	/**
+	 * Get paginated users ids for use by index_pending base class method
+	 *
+	 * @param $page
+	 * @param $per_page
+	 * @return array
+	 */
+	public function get_items_ids( $page, $per_page ) {
+
+		$posts = get_users( array(
+			'offset' => ( $page > 0 ) ? $per_page * ( $page -1 ) : 0,
+			'number' => $per_page,
+			'blog_id' => null,
+			'fields'  => 'ID'
+		) );
+
+		return $posts;
+	}
+
 	/*
 	 * Get an integer count of the number of items which can potentially be indexed in the database
 	 *

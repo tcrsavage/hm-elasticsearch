@@ -113,8 +113,6 @@ function include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
 	}
 }
 
-add_action( 'wp_cron_hmes_reindex_types', '\\HMES\\reindex_types', 10 );
-
 function reindex_types( $type_names ) {
 
 	foreach ( $type_names as $type_name ) {
@@ -128,6 +126,18 @@ function reindex_types( $type_names ) {
 	}
 }
 
+function resync_types( $type_names ) {
+
+	foreach ( $type_names as $type_name ) {
+
+		$type = Type_Manager::get_type( $type_name );
+
+		if ( $type ) {
+
+			$type->index_pending();
+		}
+	}
+}
 
 add_filter( 'cron_schedules', function( $intervals ) {
 

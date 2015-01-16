@@ -22,6 +22,14 @@ jQuery( document ).ready( function() {
 		HMESIndexTypeManager.reindex( self.attr( 'data-type-name' ) );
 	} );
 
+	jQuery( '.hm-es-resync-submit' ).click( function( e ) {
+
+		e.preventDefault();
+
+		var self = jQuery( this );
+
+		HMESIndexTypeManager.resync( self.attr( 'data-type-name' ) );
+	} );
 
 	jQuery( '.hm-es-status' ).each( function() {
 
@@ -44,7 +52,7 @@ HMESIndexTypeManager = new function() {
 
 	self.reindex = function( type, callback ) {
 
-		jQuery.post( ajaxurl, { action: 'hmes_refresh_index', type_name: type, nonce: self.getNonce() }, function( data ) {
+		jQuery.post( ajaxurl, { action: 'hmes_init_index', type_name: type, nonce: self.getNonce() }, function( data ) {
 
 		} ).done( function() {
 
@@ -65,6 +73,30 @@ HMESIndexTypeManager = new function() {
 
 		} );
 
+	};
+
+	self.resync = function( type ) {
+
+		jQuery.post( ajaxurl, { action: 'hmes_resync_index', type_name: type, nonce: self.getNonce() }, function( data ) {
+
+		} ).done( function() {
+
+			var recurse = function( data ) {
+
+				if ( ! data.is_doing_full_index) {
+					return;
+				}
+
+				setTimeout( function() {
+					self.updateStatus( type, function( data ) { recurse( data ) } );
+				}, 5000 )
+			};
+
+			self.updateStatus( type, function( data ) {
+				recurse( data );
+			} )
+
+		} );
 	};
 
 	self.updateStatus = function( type, callback ) {
