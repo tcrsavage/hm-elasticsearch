@@ -11,7 +11,7 @@ class Term extends Base {
 	public $delete_hooks     = array();
 	public $mappable_hooks   = array(
 		'create_term'    => 'update_term_callback',
-		'edited_terms'   => 'update_term_callback',
+		'edit_term'      => 'update_term_callback',
 		'delete_term'    => 'delete_term_callback'
 	);
 
