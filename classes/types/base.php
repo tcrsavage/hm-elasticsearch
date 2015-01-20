@@ -325,17 +325,25 @@ abstract class Base {
 	 *
 	 * @return bool
 	 */
-	function acquire_save_lock() {
+	function acquire_lock( $action ) {
 
-		return wp_cache_add( 'hmes_queued_actions_save_lock_' . $this->name, '1', '', 60 );
+		$attempts = 0;
+
+		//Wait until other threads have finished saving their queued items (failsafe)
+		while ( ! wp_cache_add( 'hmes_queued_actions_lock_' . $this->name . '_' . $action, '1', '', 60 ) && $attempts < 10 ) {
+			$attempts++;
+			time_nanosleep( 0, 500000000 );
+		}
+
+		return $attempts < 10 ? true : false;
 	}
 
 	/**
 	 * Clear the save lock after global actions have been updated
 	 */
-	function clear_save_lock() {
+	function clear_lock( $action ) {
 
-		wp_cache_delete( 'hmes_queued_actions_save_lock_' . $this->name );
+		wp_cache_delete( 'hmes_queued_actions_lock_' . $this->name . '_' . $action );
 	}
 
 	/**
@@ -344,15 +352,16 @@ abstract class Base {
 	 */
 	function save_actions() {
 
-		$attempts = 0;
-
-		//Wait until other threads have finished saving their queued items (failsafe)
-		while ( ! $this->acquire_save_lock() && $attempts < 10 ) {
-			$attempts++;
-			time_nanosleep( 0, 500000000 );
+		//no actions to save
+		if ( ! $this->queued_actions ) {
+			return;
 		}
 
-		$saved  = get_option( 'hmes_queued_actions_' . $this->name, array() );
+		if ( ! $this->acquire_lock( 'save_actions' ) ) {
+			return;
+		}
+
+		$saved  = $this->get_saved_actions();
 		$all    = array_replace_recursive( $saved, $this->queued_actions );
 
 		if ( count( $all ) > 10000 ) {
@@ -372,7 +381,7 @@ abstract class Base {
 
 		update_option( 'hmes_queued_actions_' . $this->name, $all );
 
-		$this->clear_save_lock();
+		$this->clear_lock( 'save_actions' );
 	}
 
 	/**
@@ -382,7 +391,7 @@ abstract class Base {
 	 */
 	function get_saved_actions() {
 
-		return get_option( 'hmes_queued_actions_' . $this->name );
+		return get_option( 'hmes_queued_actions_' . $this->name, array() );
 	}
 
 	/**
@@ -409,10 +418,16 @@ abstract class Base {
 	 */
 	function execute_queued_actions() {
 
+		if ( ! $this->acquire_lock( 'execute_queued_actions' ) ) {
+			return;
+		}
+
 		$actions = $this->get_saved_actions();
 		$this->clear_saved_actions();
 
 		if ( ! $actions ) {
+
+			$this->clear_lock( 'execute_queued_actions' );
 			return;
 		}
 
@@ -421,8 +436,8 @@ abstract class Base {
 
 			Logger::save_log( array(
 				'timestamp'      => time(),
-				'message'        => 'Failed to execute syncing actions for ' . count( $this->get_queued_actions() ) . ' items.',
-				'data'           => array( 'document_type' => $this->name, 'queued_actions' => $this->get_queued_actions() )
+				'message'        => 'Failed to execute syncing actions for ' . $actions . ' items.',
+				'data'           => array( 'document_type' => $this->name, 'queued_actions' => $actions )
 			) );
 
 			$this->queued_actions = $actions;
@@ -443,6 +458,8 @@ abstract class Base {
 			//Finish the bulk transaction
 			$this->get_wrapper()->get_client()->commit();
 		}
+
+		$this->clear_lock( 'execute_queued_actions' );
 	}
 
 	/**
