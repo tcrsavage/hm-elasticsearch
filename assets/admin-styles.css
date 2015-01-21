@@ -81,3 +81,11 @@
 
 	background-color: rgb( 255, 250, 217 )
 }
+
+.hm-es-automatic-indexing-information {
+	margin-bottom: 10px;
+}
+
+.hm-es-automatic-indexing-information div {
+	margin-bottom: 5px;
+}

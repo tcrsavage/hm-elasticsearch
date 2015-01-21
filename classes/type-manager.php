@@ -7,6 +7,7 @@ use HMES\Types\Base;
 class Type_Manager {
 
 	protected static $types = array();
+	public static $index_cron_name = 'hmes_update_index_cron';
 
 	/**
 	 * Initialise the HMES type classes (verify setup and set hooks)
@@ -104,13 +105,13 @@ class Type_Manager {
 			return;
 		}
 
-		add_action( 'hmes_update_index_cron', array( 'HMES\Type_Manager', 'execute_index_cron' ), 10, 5 );
+		add_action( static::$index_cron_name, array( 'HMES\Type_Manager', 'execute_index_cron' ), 10, 5 );
 
-		if ( wp_next_scheduled( 'hmes_update_index_cron' ) ) {
+		if ( wp_next_scheduled( static::$index_cron_name ) ) {
 			return;
 		}
 
-		wp_schedule_event( time(), 'minutes_10', 'hmes_update_index_cron' );
+		wp_schedule_event( time(), 'minutes_10', static::$index_cron_name );
 	}
 
 	public static function execute_index_cron() {

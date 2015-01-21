@@ -102,6 +102,18 @@ function admin_screen() {
 						<tr valign="top">
 							<th scope="row"><label for="hm_es_reindex_<?php echo $type->name; ?>">Indexing</label></th>
 							<td>
+
+								<?php if ( Configuration::get_is_indexing_enabled() ) : ?>
+
+									<?php $next_scheduled = ( time() < wp_next_scheduled( Type_Manager::$index_cron_name ) ) ? human_time_diff( time(), wp_next_scheduled( Type_Manager::$index_cron_name ) ) : 'now'; ?>
+
+									<div class="hm-es-automatic-indexing-information">
+										<div>Items pending sync: <strong><?php echo count( $type->get_saved_actions() ); ?></strong></div>
+										<div>Next automatic sync: <strong><?php echo $next_scheduled ?></strong></div>
+									</div>
+
+								<?php endif; ?>
+
 								<input type="button" id="hm_es_reindex_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="button hm-es-reindex-submit" value="Reindex" />
 								<input type="button" id="hm_es_resync_<?php echo $type->name; ?>" data-type-name="<?php echo $type->name; ?>" class="button hm-es-resync-submit" value="Resync" />
 							</td>
