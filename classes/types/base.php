@@ -379,7 +379,8 @@ abstract class Base {
 			$all = array_slice( $all, -10000, 10000, true );
 		}
 
-		update_option( 'hmes_queued_actions_' . $this->name, $all );
+		$this->clear_saved_actions();
+		add_option( 'hmes_queued_actions_' . $this->name, $all, '', 'no' );
 
 		$this->clear_lock( 'save_actions' );
 	}
