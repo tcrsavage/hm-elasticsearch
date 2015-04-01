@@ -30,12 +30,12 @@ add_action( 'plugins_loaded', '\\HMES\\init_types' );
  * @return array
  */
 function get_type_class_names() {
-	return array(
+	return apply_filters( 'hmes_index_types', array(
 		'post'      => '\\HMES\\Types\Post',
 		'user'      => '\\HMES\\Types\User',
 		'comment'   => '\\HMES\\Types\Comment',
 		'term'      => '\\HMES\\Types\Term'
-	);
+	) );
 }
 
 /**
