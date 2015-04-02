@@ -70,6 +70,11 @@ class Configuration {
 		return apply_filters( 'hmes_default_protocol', self::get_option( 'server_protocol', 'http' ) );
 	}
 
+	/**
+	 * Gets the index name to be used
+	 *
+	 * @return string
+	 */
 	public static function get_default_index_name() {
 
 		$current = defined( 'HMES_INDEX_NAME' ) ? HMES_INDEX_NAME : 'hmes';

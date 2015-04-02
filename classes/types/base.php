@@ -72,11 +72,29 @@ abstract class Base {
 	public abstract function get_items_count();
 
 	/**
+	 * Get the mapping array used for mapping the current model type
+	 *
 	 * @return mixed
 	 */
 	public function get_mapping() {
 
-		return false;
+		return apply_filters( 'hmes_mapping_' . $this->name, array() );
+	}
+
+	/**
+	 * Set the mapping for the current model type
+	 *
+	 * @return mixed
+	 */
+	public function set_mapping() {
+
+		if ( ! $this->get_mapping() ) {
+			return false;
+		}
+
+		return $this->get_client()->map( $this->get_mapping(), array(
+			'type' => $this->name
+		) );
 	}
 
 	/**
@@ -218,6 +236,7 @@ abstract class Base {
 
 		$this->set_is_doing_full_index( true );
 		$this->delete_all_indexed_items();
+		$this->set_mapping();
 
 		while ( $has_items ) {
 
@@ -242,6 +261,12 @@ abstract class Base {
 		$this->set_is_doing_full_index( false );
 	}
 
+	/**
+	 * Index all items which are pending redindex or insertion
+	 *
+	 * This method is called every 10minues via WP_Cron by default for each model type
+	 *
+	 */
 	function index_pending() {
 
 		$this->set_is_doing_full_index( true );

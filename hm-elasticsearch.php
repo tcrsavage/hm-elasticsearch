@@ -113,6 +113,11 @@ function include_dir( $dir, $depth = 0, $max_scan_depth = 5 ) {
 	}
 }
 
+/**
+ * Reindex all of the supplied types (fires immediately, does trigger a cron)
+ *
+ * @param $type_names
+ */
 function reindex_types( $type_names ) {
 
 	foreach ( $type_names as $type_name ) {
@@ -120,12 +125,16 @@ function reindex_types( $type_names ) {
 		$type = Type_Manager::get_type( $type_name );
 
 		if ( $type ) {
-
 			$type->index_all();
 		}
 	}
 }
 
+/**
+ * Resync all of the supplied types (adds missing entries. fires immediately, does trigger a cron)
+ *
+ * @param $type_names
+ */
 function resync_types( $type_names ) {
 
 	foreach ( $type_names as $type_name ) {
@@ -139,6 +148,9 @@ function resync_types( $type_names ) {
 	}
 }
 
+/**
+ * Add a 10 minute schedule to WP Cron
+ */
 add_filter( 'cron_schedules', function( $intervals ) {
 
 	$intervals['minutes_10'] = array('interval' => 10*60, 'display' => 'Once 10 minutes');
