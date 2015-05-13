@@ -287,7 +287,7 @@ abstract class Base {
 			$items = $this->get_items_ids( $page, $this->items_per_page );
 
 			$r = $this->search( array(
-				'fields' => [],
+				'fields' => array(),
 				'query' => array(
 					'ids' => array( 'values' => $items )
 				),
